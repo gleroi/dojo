@@ -1,0 +1,6 @@
+[package]
+name = "bank-ocr"
+version = "0.1.0"
+authors = ["Guillaume Leroi <guillaume-externe.leroi@erdf.fr>"]
+
+[dependencies]
