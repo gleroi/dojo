@@ -1,4 +1,6 @@
 use digits::*;
+use std::io::{self, BufReader};
+use std::fs::File;
 
 pub fn interpret_digits(entry: [Digit; ACCOUNT_LENGTH]) -> Option<u32> {
     const BASE : u32 = 10;
@@ -33,6 +35,28 @@ pub fn read_digits(input: &[&str; 4]) -> [Digit; ACCOUNT_LENGTH] {
             result[digit_index].set_at(row, col, cell);
         }
     }
-
     return result;
+}
+
+pub fn read_file(input: &io::Read) -> Vec<[String; 3]> {
+    let reader = BufReader::new(input);
+    let mut result : Vec<[&str; 3]> = Vec::new();
+    let mut done = false;
+    while !done {
+        let mut entry : [&str; 3];
+        for index in 0..3 {
+            let line = String::with_capacity(28);
+            let readedCount = reader.read_line(&line);
+            match readedCount {
+                Result(count) => if count >= 27 {
+                    line.truncate(27);
+                    entry[index] = line.as_str();
+                }
+                else {
+                    panic!("not enough character ({0} chars)", count)
+                }
+                None => break
+            }
+        }
+    }
 }
