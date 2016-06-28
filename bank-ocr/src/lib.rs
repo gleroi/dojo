@@ -38,6 +38,51 @@ pub const TWO : Digit = Digit {
            Cell::Pipe,Cell::Underscore,Cell::Blank]
 };
 
+pub const THREE : Digit = Digit {
+    data: [Cell::Blank, Cell::Underscore, Cell::Blank,
+           Cell::Blank, Cell::Underscore, Cell::Pipe,
+           Cell::Blank, Cell::Underscore, Cell::Pipe,]
+};
+
+pub const FOUR : Digit = Digit {
+    data: [Cell::Blank, Cell::Blank, Cell::Blank,
+           Cell::Pipe, Cell::Underscore, Cell::Pipe,
+           Cell::Blank, Cell::Blank, Cell::Pipe,]
+};
+
+pub const FIVE : Digit = Digit {
+    data: [Cell::Blank, Cell::Underscore, Cell::Blank,
+           Cell::Pipe, Cell::Underscore, Cell::Blank,
+           Cell::Blank, Cell::Underscore, Cell::Pipe,]
+};
+
+pub const SIX : Digit = Digit {
+    data: [Cell::Blank, Cell::Underscore, Cell::Blank,
+           Cell::Pipe, Cell::Underscore, Cell::Blank,
+           Cell::Pipe, Cell::Underscore, Cell::Pipe,]
+};
+
+pub const SEVEN : Digit = Digit {
+    data: [Cell::Blank, Cell::Underscore, Cell::Blank,
+           Cell::Blank, Cell::Blank, Cell::Pipe,
+           Cell::Blank, Cell::Blank, Cell::Pipe,]
+};
+
+pub const EIGHT : Digit = Digit {
+    data: [Cell::Blank, Cell::Underscore, Cell::Blank,
+           Cell::Pipe, Cell::Underscore, Cell::Pipe,
+           Cell::Pipe, Cell::Underscore, Cell::Pipe,]
+};
+
+pub const NINE : Digit = Digit {
+    data: [Cell::Blank, Cell::Underscore, Cell::Blank,
+           Cell::Pipe, Cell::Underscore, Cell::Pipe,
+           Cell::Blank, Cell::Underscore, Cell::Pipe,]
+};
+
+const DIGITS : [Digit; 10] = [
+    ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE
+];
 
 impl Digit {
     pub fn at(&self, row: usize, col: usize) -> Cell {
@@ -47,6 +92,31 @@ impl Digit {
     pub fn set_at(&mut self, row: usize, col: usize, val: Cell) {
         self.data[row * DIGIT_WIDTH + col] = val;
     }
+
+    pub fn value(&self) -> Option<u32> {
+        for index in 0..DIGITS.len() {
+            if DIGITS[index] == *self {
+                return Some(index as u32);
+            }
+        }
+        return None;
+    }
+}
+
+pub fn interpret_digits(entry: [Digit; ACCOUNT_LENGTH]) -> Option<u32> {
+    const BASE : u32 = 10;
+    let mut power : u32 = 1;
+    let mut account : u32 = 0;
+    for index in (0..ACCOUNT_LENGTH).rev() {
+        if let Some(value) = entry[index].value() {
+            account +=  value * power;
+            power *= BASE;
+        }
+        else {
+            return None;
+        }
+    }
+    return Some(account);
 }
 
 pub fn read_digits(input: &[&str; 4]) -> [Digit; ACCOUNT_LENGTH] {
