@@ -3,7 +3,8 @@ extern crate bank_ocr;
 mod input;
 
 use input::*;
-use bank_ocr::*;
+use bank_ocr::digits::*;
+use bank_ocr::reader::*;
 
 #[test]
 fn empty_digit_should_contains_blank_only() {
