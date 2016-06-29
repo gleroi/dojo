@@ -4,6 +4,12 @@ use bank_ocr::reader::*;
 
 use std::fs::File;
 
+fn assert_entry(entry: &[String; 3], expected_account: u32) {
+    let account_entry = read_digits(entry);
+    let account_number = interpret_digits(account_entry).unwrap();
+    assert!(account_number == expected_account);
+}
+
 #[test]
 fn read_file_one_entry_should_succeed() {
     let input = File::open("tests/files/one_entry.txt").unwrap();
@@ -11,8 +17,17 @@ fn read_file_one_entry_should_succeed() {
 
     assert!(entries.len() == 1);
 
-    let entry = &entries[0];
-    let account_entry = read_digits(entry);
-    let account_number = interpret_digits(account_entry).unwrap();
-    assert!(account_number == 123456789);
+    assert_entry(&entries[0], 123456789);
+}
+
+#[test]
+fn read_file_three_entries_should_succeed() {
+    let input = File::open("tests/files/three_entries.txt").unwrap();
+    let entries = read_file(input);
+
+    assert!(entries.len() == 3);
+
+    assert_entry(&entries[0], 999999999);
+    assert_entry(&entries[1], 123456789);
+    assert_entry(&entries[2], 51);
 }

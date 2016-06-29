@@ -48,6 +48,7 @@ pub fn read_file(input: File) -> Vec<[String; 3]> {
             Some(entry) => result.push(entry),
             None => done = true,
         }
+        skip_blank_line(&mut reader);
     }
     return result;
 }
@@ -73,4 +74,9 @@ fn read_entry(reader: &mut BufReader<File>) -> Option<[String;3]> {
         }
     }
     return Some(entry);
+}
+
+fn skip_blank_line(reader: &mut BufReader<File>) {
+    let mut line = String::with_capacity(28);
+    reader.read_line(&mut line);
 }
