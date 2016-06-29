@@ -1,5 +1,5 @@
 use digits::*;
-use std::io::{self, BufReader};
+use std::io::{BufRead, BufReader};
 use std::fs::File;
 
 pub fn interpret_digits(entry: [Digit; ACCOUNT_LENGTH]) -> Option<u32> {
@@ -18,11 +18,12 @@ pub fn interpret_digits(entry: [Digit; ACCOUNT_LENGTH]) -> Option<u32> {
     return Some(account);
 }
 
-pub fn read_digits(input: &[&str; 4]) -> [Digit; ACCOUNT_LENGTH] {
+pub fn read_digits(input: &[String; 3]) -> [Digit; ACCOUNT_LENGTH] {
     let mut result = [new_empty_digit(); ACCOUNT_LENGTH];
 
     for row in 0..3 {
-        let line = input[row];
+        let line = &input[row];
+        assert!(line.len() == 27);
         for (col_in_row, character) in line.char_indices() {
             let digit_index = col_in_row / DIGIT_WIDTH;
             let col = col_in_row % DIGIT_WIDTH;
@@ -38,25 +39,38 @@ pub fn read_digits(input: &[&str; 4]) -> [Digit; ACCOUNT_LENGTH] {
     return result;
 }
 
-// pub fn read_file(input: &io::Read) -> Vec<[String; 3]> {
-//     let reader = BufReader::new(input);
-//     let mut result : Vec<[&str; 3]> = Vec::new();
-//     let mut done = false;
-//     while !done {
-//         let mut entry : [&str; 3];
-//         for index in 0..3 {
-//             let line = String::with_capacity(28);
-//             let readedCount = reader.read_line(&line);
-//             match readedCount {
-//                 Result(count) => if count >= 27 {
-//                     line.truncate(27);
-//                     entry[index] = line.as_str();
-//                 }
-//                 else {
-//                     panic!("not enough character ({0} chars)", count)
-//                 }
-//                 None => break
-//             }
-//         }
-//     }
-// }
+pub fn read_file(input: File) -> Vec<[String; 3]> {
+    let mut reader = BufReader::new(input);
+    let mut result : Vec<[String; 3]> = Vec::new();
+    let mut done = false;
+    while !done {
+        match read_entry(&mut reader) {
+            Some(entry) => result.push(entry),
+            None => done = true,
+        }
+    }
+    return result;
+}
+
+fn read_entry(reader: &mut BufReader<File>) -> Option<[String;3]> {
+    let mut entry = [String::new(), String::new(), String::new()];
+    for index in 0..3 {
+        let mut line = String::with_capacity(28);
+        let readed_count = reader.read_line(&mut line);
+        match readed_count {
+            Ok(count) => if count >= 27 {
+                line.truncate(27);
+                entry[index] = line;
+            }
+            else {
+                println!("not enough character ({0} chars)", count);
+                return None;
+            },
+            Err(error) => {
+                println!("error in read_entry: {}", error);
+                return None;
+            }
+        }
+    }
+    return Some(entry);
+}
