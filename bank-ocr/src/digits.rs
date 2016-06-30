@@ -83,7 +83,6 @@ const DIGITS : [Digit; 10] = [
 
 pub const ACCOUNT_LENGTH: usize = 9;
 pub const DIGIT_WIDTH : usize = 3;
-const DIGIT_HEIGHT : usize = 3;
 
 impl Digit {
 

@@ -64,12 +64,10 @@ fn read_entry(reader: &mut BufReader<File>) -> Option<[String;3]> {
                 entry[index] = line;
             }
             else {
-                println!("not enough character ({0} chars)", count);
                 return None;
             },
             Err(error) => {
-                println!("error in read_entry: {}", error);
-                return None;
+                panic!("error in read_entry: {}", error);
             }
         }
     }
@@ -78,5 +76,7 @@ fn read_entry(reader: &mut BufReader<File>) -> Option<[String;3]> {
 
 fn skip_blank_line(reader: &mut BufReader<File>) {
     let mut line = String::with_capacity(28);
-    reader.read_line(&mut line);
+    if let Err(error) = reader.read_line(&mut line) {
+        panic!("error in read_entry: {}", error);
+    }
 }
