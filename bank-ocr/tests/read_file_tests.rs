@@ -1,10 +1,11 @@
 extern crate bank_ocr;
 
 use bank_ocr::reader::*;
+use bank_ocr::digits::*;
 
 use std::fs::File;
 
-fn assert_entry(entry: &[String; 3], expected_account: u32) {
+fn assert_entry(entry: &FileEntry, expected_account: u32) {
     let account_entry = read_digits(entry);
     let account_number = interpret_digits(account_entry).unwrap();
     assert!(account_number == expected_account);

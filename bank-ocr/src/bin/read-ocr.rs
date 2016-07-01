@@ -4,6 +4,7 @@ use std::env as env;
 use std::fs::File;
 
 use bank_ocr::reader::*;
+use bank_ocr::digits::*;
 
 fn main() {
     let arguments : Vec<String> = env::args().collect();
