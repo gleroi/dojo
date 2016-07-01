@@ -1,3 +1,4 @@
+use std::ops::{Index, IndexMut};
 use reader::FileEntry;
 
 #[derive(Clone, Copy, PartialEq)]
@@ -10,12 +11,6 @@ pub enum Cell {
 #[derive(Clone, Copy, PartialEq)]
 pub struct Digit {
     data: [Cell; 9],
-}
-
-pub fn new_empty_digit() -> Digit {
-    Digit {
-        data: [Cell::Blank; 9],
-    }
 }
 
 pub const ZERO : Digit = Digit {
@@ -87,6 +82,12 @@ pub const DIGIT_WIDTH : usize = 3;
 
 impl Digit {
 
+    pub fn empty() -> Digit {
+        Digit {
+            data: [Cell::Blank; 9],
+        }
+    }
+
     pub fn at(&self, row: usize, col: usize) -> Cell {
         return self.data[row * DIGIT_WIDTH + col];
     }
@@ -105,8 +106,38 @@ impl Digit {
     }
 }
 
-pub fn read_digits(input: &FileEntry) -> [Digit; ACCOUNT_LENGTH] {
-    let mut result = [new_empty_digit(); ACCOUNT_LENGTH];
+pub struct Account {
+    data: [Digit; ACCOUNT_LENGTH],
+}
+
+impl Account {
+    fn new() -> Account {
+        return Account {
+            data: [Digit::empty(); ACCOUNT_LENGTH]
+        }
+    }
+
+    pub fn len(&self) -> usize {
+        return self.data.len();
+    }
+}
+
+impl Index<usize> for Account {
+    type Output = Digit;
+
+    fn index(&self, index: usize) -> &Digit {
+        return &self.data[index];
+    }
+}
+
+impl IndexMut<usize> for Account {
+    fn index_mut(&mut self, index: usize) -> &mut Digit {
+        return &mut self.data[index];
+    }
+}
+
+pub fn read_digits(input: &FileEntry) -> Account {
+    let mut result = Account::new();
 
     for row in 0..3 {
         let line = &input[row];
@@ -127,7 +158,7 @@ pub fn read_digits(input: &FileEntry) -> [Digit; ACCOUNT_LENGTH] {
 }
 
 
-pub fn interpret_digits(entry: [Digit; ACCOUNT_LENGTH]) -> Option<u32> {
+pub fn interpret_digits(entry: Account) -> Option<u32> {
     const BASE : u32 = 10;
     let mut power : u32 = 1;
     let mut account : u32 = 0;
