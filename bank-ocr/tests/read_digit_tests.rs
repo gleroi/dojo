@@ -3,7 +3,7 @@ extern crate bank_ocr;
 mod input;
 
 use input::*;
-use bank_ocr::digits::*;
+use bank_ocr::account::*;
 use bank_ocr::reader::*;
 
 #[test]

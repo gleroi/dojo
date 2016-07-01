@@ -1,7 +1,7 @@
 extern crate bank_ocr;
 
 use bank_ocr::reader::*;
-use bank_ocr::digits::*;
+use bank_ocr::account::*;
 
 use std::fs::File;
 

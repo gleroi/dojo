@@ -1,5 +1,5 @@
 pub mod reader;
-pub mod digits;
+pub mod account;
 pub mod checksum;
 
 
