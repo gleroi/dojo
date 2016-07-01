@@ -19,7 +19,7 @@ fn main() {
             process_file(file);
         }
         Err(error) => {
-            panic!("error: {0:9}", error);
+            panic!("error: {0}", error);
         }
     }
 }
