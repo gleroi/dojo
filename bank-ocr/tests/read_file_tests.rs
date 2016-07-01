@@ -7,7 +7,7 @@ use std::fs::File;
 
 fn assert_entry(entry: &FileEntry, expected_account: u32) {
     let account_entry = read_digits(entry);
-    let account_number = interpret_digits(account_entry).unwrap();
+    let account_number = account_entry.value().unwrap();
     assert!(account_number == expected_account);
 }
 

@@ -120,6 +120,22 @@ impl Account {
     pub fn len(&self) -> usize {
         return self.data.len();
     }
+
+    pub fn value(&self) -> Option<u32> {
+        const BASE : u32 = 10;
+        let mut power : u32 = 1;
+        let mut account : u32 = 0;
+        for index in (0..ACCOUNT_LENGTH).rev() {
+            if let Some(value) = self[index].value() {
+                account +=  value * power;
+                power *= BASE;
+            }
+            else {
+                return None;
+            }
+        }
+            return Some(account);
+    }
 }
 
 impl Index<usize> for Account {
@@ -155,21 +171,4 @@ pub fn read_digits(input: &FileEntry) -> Account {
         }
     }
     return result;
-}
-
-
-pub fn interpret_digits(entry: Account) -> Option<u32> {
-    const BASE : u32 = 10;
-    let mut power : u32 = 1;
-    let mut account : u32 = 0;
-    for index in (0..ACCOUNT_LENGTH).rev() {
-        if let Some(value) = entry[index].value() {
-            account +=  value * power;
-            power *= BASE;
-        }
-        else {
-            return None;
-        }
-    }
-    return Some(account);
 }

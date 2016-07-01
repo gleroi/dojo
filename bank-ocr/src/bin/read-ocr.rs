@@ -28,9 +28,9 @@ fn process_file(file: File) {
     let entries = read_file(file);
 
     for entry in &entries {
-        let digits = read_digits(entry);
-        if let Some(account) = interpret_digits(digits) {
-            println!("{0:09}", account);        
+        let account = read_digits(entry);
+        if let Some(value) = account.value() {
+            println!("{0:09}", value);        
         }
     }
 }
