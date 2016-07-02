@@ -17,82 +17,137 @@ pub struct Digit {
     data: [Cell; 9],
 }
 
-pub const ZERO : Digit = Digit {
-    data: [Cell::Blank, Cell::Underscore, Cell::Blank, 
-           Cell::Pipe, Cell::Blank, Cell::Pipe, 
-           Cell::Pipe, Cell::Underscore, Cell::Pipe]
+pub const ZERO: Digit = Digit {
+    data: [Cell::Blank,
+           Cell::Underscore,
+           Cell::Blank,
+           Cell::Pipe,
+           Cell::Blank,
+           Cell::Pipe,
+           Cell::Pipe,
+           Cell::Underscore,
+           Cell::Pipe],
 };
 
-pub const ONE : Digit = Digit {
-    data: [Cell::Blank,Cell::Blank,Cell::Blank,
-           Cell::Blank,Cell::Blank,Cell::Pipe,
-           Cell::Blank,Cell::Blank,Cell::Pipe]
+pub const ONE: Digit = Digit {
+    data: [Cell::Blank,
+           Cell::Blank,
+           Cell::Blank,
+           Cell::Blank,
+           Cell::Blank,
+           Cell::Pipe,
+           Cell::Blank,
+           Cell::Blank,
+           Cell::Pipe],
 };
 
-pub const TWO : Digit = Digit {
-    data: [Cell::Blank,Cell::Underscore,Cell::Blank,
-           Cell::Blank,Cell::Underscore,Cell::Pipe,
-           Cell::Pipe,Cell::Underscore,Cell::Blank]
+pub const TWO: Digit = Digit {
+    data: [Cell::Blank,
+           Cell::Underscore,
+           Cell::Blank,
+           Cell::Blank,
+           Cell::Underscore,
+           Cell::Pipe,
+           Cell::Pipe,
+           Cell::Underscore,
+           Cell::Blank],
 };
 
-pub const THREE : Digit = Digit {
-    data: [Cell::Blank, Cell::Underscore, Cell::Blank,
-           Cell::Blank, Cell::Underscore, Cell::Pipe,
-           Cell::Blank, Cell::Underscore, Cell::Pipe,]
+pub const THREE: Digit = Digit {
+    data: [Cell::Blank,
+           Cell::Underscore,
+           Cell::Blank,
+           Cell::Blank,
+           Cell::Underscore,
+           Cell::Pipe,
+           Cell::Blank,
+           Cell::Underscore,
+           Cell::Pipe],
 };
 
-pub const FOUR : Digit = Digit {
-    data: [Cell::Blank, Cell::Blank, Cell::Blank,
-           Cell::Pipe, Cell::Underscore, Cell::Pipe,
-           Cell::Blank, Cell::Blank, Cell::Pipe,]
+pub const FOUR: Digit = Digit {
+    data: [Cell::Blank,
+           Cell::Blank,
+           Cell::Blank,
+           Cell::Pipe,
+           Cell::Underscore,
+           Cell::Pipe,
+           Cell::Blank,
+           Cell::Blank,
+           Cell::Pipe],
 };
 
-pub const FIVE : Digit = Digit {
-    data: [Cell::Blank, Cell::Underscore, Cell::Blank,
-           Cell::Pipe, Cell::Underscore, Cell::Blank,
-           Cell::Blank, Cell::Underscore, Cell::Pipe,]
+pub const FIVE: Digit = Digit {
+    data: [Cell::Blank,
+           Cell::Underscore,
+           Cell::Blank,
+           Cell::Pipe,
+           Cell::Underscore,
+           Cell::Blank,
+           Cell::Blank,
+           Cell::Underscore,
+           Cell::Pipe],
 };
 
-pub const SIX : Digit = Digit {
-    data: [Cell::Blank, Cell::Underscore, Cell::Blank,
-           Cell::Pipe, Cell::Underscore, Cell::Blank,
-           Cell::Pipe, Cell::Underscore, Cell::Pipe,]
+pub const SIX: Digit = Digit {
+    data: [Cell::Blank,
+           Cell::Underscore,
+           Cell::Blank,
+           Cell::Pipe,
+           Cell::Underscore,
+           Cell::Blank,
+           Cell::Pipe,
+           Cell::Underscore,
+           Cell::Pipe],
 };
 
-pub const SEVEN : Digit = Digit {
-    data: [Cell::Blank, Cell::Underscore, Cell::Blank,
-           Cell::Blank, Cell::Blank, Cell::Pipe,
-           Cell::Blank, Cell::Blank, Cell::Pipe,]
+pub const SEVEN: Digit = Digit {
+    data: [Cell::Blank,
+           Cell::Underscore,
+           Cell::Blank,
+           Cell::Blank,
+           Cell::Blank,
+           Cell::Pipe,
+           Cell::Blank,
+           Cell::Blank,
+           Cell::Pipe],
 };
 
-pub const EIGHT : Digit = Digit {
-    data: [Cell::Blank, Cell::Underscore, Cell::Blank,
-           Cell::Pipe, Cell::Underscore, Cell::Pipe,
-           Cell::Pipe, Cell::Underscore, Cell::Pipe,]
+pub const EIGHT: Digit = Digit {
+    data: [Cell::Blank,
+           Cell::Underscore,
+           Cell::Blank,
+           Cell::Pipe,
+           Cell::Underscore,
+           Cell::Pipe,
+           Cell::Pipe,
+           Cell::Underscore,
+           Cell::Pipe],
 };
 
-pub const NINE : Digit = Digit {
-    data: [Cell::Blank, Cell::Underscore, Cell::Blank,
-           Cell::Pipe, Cell::Underscore, Cell::Pipe,
-           Cell::Blank, Cell::Underscore, Cell::Pipe,]
+pub const NINE: Digit = Digit {
+    data: [Cell::Blank,
+           Cell::Underscore,
+           Cell::Blank,
+           Cell::Pipe,
+           Cell::Underscore,
+           Cell::Pipe,
+           Cell::Blank,
+           Cell::Underscore,
+           Cell::Pipe],
 };
 
-const DIGITS : [Digit; 10] = [
-    ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE
-];
+const DIGITS: [Digit; 10] = [ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE];
 
 pub const ACCOUNT_LENGTH: usize = 9;
-pub const DIGIT_WIDTH : usize = 3;
+pub const DIGIT_WIDTH: usize = 3;
 
 impl Digit {
-
     /// Create an empty Digit
     ///
     /// An empty digit is a `Digit` which cells are all `Cell::Blank`
     pub fn empty() -> Digit {
-        Digit {
-            data: [Cell::Blank; 9],
-        }
+        Digit { data: [Cell::Blank; 9] }
     }
 
     pub fn at(&self, row: usize, col: usize) -> Cell {
@@ -123,9 +178,7 @@ pub struct Account {
 
 impl Account {
     fn new() -> Account {
-        return Account {
-            data: [Digit::empty(); ACCOUNT_LENGTH]
-        }
+        return Account { data: [Digit::empty(); ACCOUNT_LENGTH] };
     }
 
     pub fn len(&self) -> usize {
@@ -133,19 +186,18 @@ impl Account {
     }
 
     pub fn value(&self) -> Option<u32> {
-        const BASE : u32 = 10;
-        let mut power : u32 = 1;
-        let mut account : u32 = 0;
+        const BASE: u32 = 10;
+        let mut power: u32 = 1;
+        let mut account: u32 = 0;
         for index in (0..ACCOUNT_LENGTH).rev() {
             if let Some(value) = self[index].value() {
-                account +=  value * power;
+                account += value * power;
                 power *= BASE;
-            }
-            else {
+            } else {
                 return None;
             }
         }
-            return Some(account);
+        return Some(account);
     }
 }
 
