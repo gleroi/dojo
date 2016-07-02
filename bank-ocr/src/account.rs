@@ -116,7 +116,7 @@ impl Digit {
 
 /// An account number, composed of nine `Digits`
 ///
-/// A `Account` can be created by using the function `account::read_digits(&FileEntry)`
+/// A `Account` can be created by using the function `parse(&FileEntry)`
 pub struct Account {
     data: [Digit; ACCOUNT_LENGTH],
 }
@@ -163,7 +163,7 @@ impl IndexMut<usize> for Account {
     }
 }
 
-pub fn read_digits(input: &FileEntry) -> Account {
+pub fn parse(input: &FileEntry) -> Account {
     let mut result = Account::new();
 
     for row in 0..3 {

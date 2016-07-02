@@ -6,7 +6,7 @@ use bank_ocr::account::*;
 use std::fs::File;
 
 fn assert_entry(entry: &FileEntry, expected_account: u32) {
-    let account_entry = read_digits(entry);
+    let account_entry = parse(entry);
     let account_number = account_entry.value().unwrap();
     assert!(account_number == expected_account);
 }

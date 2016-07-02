@@ -28,7 +28,7 @@ fn process_file(file: File) {
     let entries = read_file(file);
 
     for entry in &entries {
-        let account = read_digits(entry);
+        let account = parse(entry);
         if let Some(value) = account.value() {
             println!("{0:09}", value);        
         }
