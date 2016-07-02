@@ -8,6 +8,10 @@ pub enum Cell {
     Underscore,
 }
 
+/// `Digit` from an account number.
+///
+/// A `Digit` is a square of 9 `Cell`s.
+/// Certains patterns of cells represent valid numbers, between 0 and 9.
 #[derive(Clone, Copy, PartialEq)]
 pub struct Digit {
     data: [Cell; 9],
@@ -82,6 +86,9 @@ pub const DIGIT_WIDTH : usize = 3;
 
 impl Digit {
 
+    /// Create an empty Digit
+    ///
+    /// An empty digit is a `Digit` which cells are all `Cell::Blank`
     pub fn empty() -> Digit {
         Digit {
             data: [Cell::Blank; 9],
@@ -96,6 +103,7 @@ impl Digit {
         self.data[row * DIGIT_WIDTH + col] = val;
     }
 
+    /// retuns the value between [0-9] of a Digit, or `None`
     pub fn value(&self) -> Option<u32> {
         for index in 0..DIGITS.len() {
             if DIGITS[index] == *self {
@@ -106,6 +114,9 @@ impl Digit {
     }
 }
 
+/// An account number, composed of nine `Digits`
+///
+/// A `Account` can be created by using the function `account::read_digits(&FileEntry)`
 pub struct Account {
     data: [Digit; ACCOUNT_LENGTH],
 }
