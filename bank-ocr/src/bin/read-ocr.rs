@@ -5,6 +5,7 @@ use std::fs::File;
 
 use bank_ocr::reader::*;
 use bank_ocr::account::*;
+use bank_ocr::checksum::*;
 
 fn main() {
     let arguments : Vec<String> = env::args().collect();
@@ -29,8 +30,7 @@ fn process_file(file: File) {
 
     for entry in &entries {
         let account = parse(entry);
-        if let Some(value) = account.value() {
-            println!("{0:09}", value);        
-        }
+        let state = validate(account);
+        println!("{}", state.description());
     }
 }

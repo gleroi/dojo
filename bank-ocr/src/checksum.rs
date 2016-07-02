@@ -1,3 +1,5 @@
+use account::*;
+
 pub fn checksum(account: u32) -> bool {
     const BASE : u32 = 10;
 
@@ -9,4 +11,34 @@ pub fn checksum(account: u32) -> bool {
         checksum += multiplcator * digit;
     }
     return checksum % 11 == 0;
+}
+
+pub enum ValidityState {
+    Valid(String),
+    Illegal(String),
+    Error(String),
+}
+
+impl ValidityState {
+    pub fn description(&self) -> String {
+        match *self {
+            ValidityState::Valid(ref value) => format!("{}", value),
+            ValidityState::Illegal(ref value) => format!("{} {}", value, "ILL"),
+            ValidityState::Error(ref value) => format!("{} {}", value, "ERR"),
+        }
+    }
+}
+
+pub fn validate(account: Account) -> ValidityState {
+    let value = account.value();
+    let description = account.description();
+    match value {
+        None => ValidityState::Error(description),
+        Some(value) => if checksum(value) {
+            ValidityState::Valid(description)
+        }
+        else {
+            ValidityState::Illegal(description)
+        }
+    }
 }

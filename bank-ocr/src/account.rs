@@ -199,6 +199,18 @@ impl Account {
         }
         return Some(account);
     }
+    pub fn description(&self) -> String {
+        let mut result = String::with_capacity(ACCOUNT_LENGTH);
+        for digit in &self.data {
+            if let Some(value) = digit.value() {
+                result.push_str(&value.to_string());
+            }
+            else {
+                result.push('?');
+            }
+        }
+        return result;
+    }
 }
 
 impl Index<usize> for Account {
