@@ -173,6 +173,7 @@ impl Digit {
 /// An account number, composed of nine `Digits`
 ///
 /// A `Account` can be created by using the function `parse(&FileEntry)`
+#[derive(Clone)]
 pub struct Account {
     data: [Digit; ACCOUNT_LENGTH],
 }
