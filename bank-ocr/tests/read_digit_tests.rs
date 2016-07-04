@@ -4,7 +4,6 @@ mod input;
 
 use input::*;
 use bank_ocr::account::*;
-use bank_ocr::reader::*;
 
 #[test]
 fn empty_digit_should_contains_blank_only() {
@@ -15,10 +14,6 @@ fn empty_digit_should_contains_blank_only() {
             assert!(empty.at(row, col) == Cell::Blank);
         }
     }
-}
-
-fn convert_input(input: [&'static str; 4]) -> FileEntry {
-    return FileEntry::with_data([input[0].to_string(), input[1].to_string(), input[2].to_string()]);
 }
 
 fn assert_account_is_all_digit(account: &Account, digit: Digit) {

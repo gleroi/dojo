@@ -30,7 +30,7 @@ fn process_file(file: File) {
 
     for entry in &entries {
         let account = parse(entry);
-        let state = validate(account);
+        let state = validate(&account);
         println!("{}", state.description());
     }
 }

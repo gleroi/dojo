@@ -1,7 +1,7 @@
 use std::ops::{Index, IndexMut};
 use reader::FileEntry;
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq, Debug)]
 pub enum Cell {
     Blank,
     Pipe,
@@ -12,7 +12,7 @@ pub enum Cell {
 ///
 /// A `Digit` is a square of 9 `Cell`s.
 /// Certains patterns of cells represent valid numbers, between 0 and 9.
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq, Debug)]
 pub struct Digit {
     data: [Cell; 9],
 }
@@ -141,6 +141,7 @@ const DIGITS: [Digit; 10] = [ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGH
 
 pub const ACCOUNT_LENGTH: usize = 9;
 pub const DIGIT_WIDTH: usize = 3;
+pub const DIGIT_HEIGHT: usize = 3;
 
 impl Digit {
     /// Create an empty Digit

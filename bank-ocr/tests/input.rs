@@ -1,3 +1,11 @@
+extern crate bank_ocr;
+
+use bank_ocr::reader::*;
+
+pub fn convert_input(input: [&'static str; 4]) -> FileEntry {
+    return FileEntry::with_data([input[0].to_string(), input[1].to_string(), input[2].to_string()]);
+}
+
 pub const ZERO_INPUT : [&'static str; 4] = [
 " _  _  _  _  _  _  _  _  _ ",
 "| || || || || || || || || |",

@@ -13,6 +13,7 @@ pub fn checksum(account: u32) -> bool {
     return checksum % 11 == 0;
 }
 
+#[derive(PartialEq, Debug)]
 pub enum ValidityState {
     Valid(String),
     Illegal(String),
@@ -29,16 +30,17 @@ impl ValidityState {
     }
 }
 
-pub fn validate(account: Account) -> ValidityState {
+pub fn validate(account: &Account) -> ValidityState {
     let value = account.value();
     let description = account.description();
     match value {
-        None => ValidityState::Error(description),
+        None => ValidityState::Illegal(description),
         Some(value) => if checksum(value) {
             ValidityState::Valid(description)
         }
         else {
-            ValidityState::Illegal(description)
+            ValidityState::Error(description)
         }
     }
 }
+
