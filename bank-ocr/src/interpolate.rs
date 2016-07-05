@@ -2,15 +2,6 @@ use account::*;
 use checksum::*;
 
 pub fn interpolate_account(account: Account) -> Vec<Account> {
-    let state = validate(&account);
-    match state {
-        ValidityState::Error(_) => interpolate_valid_digits(account),
-        ValidityState::Illegal(_) => panic!("not implemented"),
-        _ => vec!{ account.clone() },
-    }
-}
-
-pub fn interpolate_valid_digits(account: Account) -> Vec<Account> {
     let mut result : Vec<Account> = Vec::new();
 
     for index in 0..ACCOUNT_LENGTH {
@@ -30,23 +21,20 @@ pub fn interpolate_valid_digits(account: Account) -> Vec<Account> {
 }
 
 pub fn interpolate_digit(input : Digit) -> Vec<Digit> {
+    let others : Vec<Cell> = vec!{Cell::Blank, Cell::Pipe, Cell::Underscore};
     let mut alternatives : Vec<Digit> = Vec::new();
     let mut digit = input;
-
-    push_if_valid(&mut alternatives, &digit);
 
     for row in 0..DIGIT_HEIGHT {
         for col in 0..DIGIT_WIDTH {
             let original = digit.at(row, col);
-            if original == Cell::Blank {
-                digit.set_at(row, col, Cell::Pipe);
-                push_if_valid(&mut alternatives, &digit);
-
-                digit.set_at(row, col, Cell::Underscore);
-                push_if_valid(&mut alternatives, &digit);
-
-                digit.set_at(row, col, Cell::Blank);
+            for other in &others {
+                if original != *other {
+                    digit.set_at(row, col, *other);
+                    push_if_valid(&mut alternatives, &digit);
+                }
             }
+            digit.set_at(row, col, original);
         }
     }
     return alternatives;

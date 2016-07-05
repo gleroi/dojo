@@ -2,7 +2,7 @@ extern crate bank_ocr;
 
 mod input;
 
-use input::{convert_input,ONE_INPUT,THREE_INPUT};
+use input::{convert_input,ONE_INPUT,THREE_INPUT,SEVEN_INPUT,EIGHT_INPUT};
 use bank_ocr::interpolate::*;
 use bank_ocr::account::parse;
 
@@ -24,6 +24,15 @@ fn all_three_should_interpolate_to_333393333() {
     assert_eq!(Some(333393333), alternatives[0].value());
 }
 
+#[test]
+fn all_seven_should_interpolate_to_777777177() {
+    let account = parse(&convert_input(SEVEN_INPUT));
+    let alternatives = interpolate_account(account);
+
+    assert_eq!(1, alternatives.len());
+    assert_eq!(Some(777777177), alternatives[0].value());
+}
+
 const TWO_MILLIONS : [&'static str; 4] = [
 " _  _  _  _  _  _  _  _  _ ",
 " _|| || || || || || || || |",
@@ -32,10 +41,37 @@ const TWO_MILLIONS : [&'static str; 4] = [
 ];
 
 #[test]
-fn tw_hundrer_million_should_interpolate_to_200800000() {
+fn two_hundred_million_should_interpolate_to_200800000() {
     let account = parse(&convert_input(TWO_MILLIONS));
     let alternatives = interpolate_account(account);
 
     assert_eq!(1, alternatives.len());
     assert_eq!(Some(200800000), alternatives[0].value());
+}
+
+const ILLEGAL_ACCOUNT : [&'static str; 4] = [
+"    _  _     _  _  _  _  _ ",
+" _| _| _||_||_ |_   ||_||_|",
+"  ||_  _|  | _||_|  ||_| _|",
+"                           ",
+];
+
+#[test]
+fn illegal_account_should_interpolate_to_123456789() {
+    let account = parse(&convert_input(ILLEGAL_ACCOUNT));
+    let alternatives = interpolate_account(account);
+
+    assert_eq!(1, alternatives.len());
+    assert_eq!(Some(123456789), alternatives[0].value());
+}
+
+#[test]
+fn all_eight_should_interpolate_to_3_alternatives() {
+let account = parse(&convert_input(EIGHT_INPUT));
+    let alternatives = interpolate_account(account);
+
+    assert_eq!(3, alternatives.len());
+    assert_eq!(Some(888886888), alternatives[0].value());
+    assert_eq!(Some(888888988), alternatives[1].value());
+    assert_eq!(Some(888888880), alternatives[2].value());
 }
