@@ -49,7 +49,7 @@ fn two_hundred_million_should_interpolate_to_200800000() {
     assert_eq!(Some(200800000), alternatives[0].value());
 }
 
-const ILLEGAL_ACCOUNT : [&'static str; 4] = [
+const ILLEGAL_ACCOUNT_ONE : [&'static str; 4] = [
 "    _  _     _  _  _  _  _ ",
 " _| _| _||_||_ |_   ||_||_|",
 "  ||_  _|  | _||_|  ||_| _|",
@@ -57,13 +57,30 @@ const ILLEGAL_ACCOUNT : [&'static str; 4] = [
 ];
 
 #[test]
-fn illegal_account_should_interpolate_to_123456789() {
-    let account = parse(&convert_input(ILLEGAL_ACCOUNT));
+fn illegal_account_1_should_interpolate_to_123456789() {
+    let account = parse(&convert_input(ILLEGAL_ACCOUNT_ONE));
     let alternatives = interpolate_account(account);
 
     assert_eq!(1, alternatives.len());
     assert_eq!(Some(123456789), alternatives[0].value());
 }
+
+const ILLEGAL_ACCOUNT_51 : [&'static str; 4] = [
+" _     _  _  _  _  _  _    ",
+"| || || || || || || ||_   |",
+"|_||_||_||_||_||_||_| _|  |",
+"                           ",
+];
+
+#[test]
+fn illegal_account_51_should_interpolate_to_51() {
+    let account = parse(&convert_input(ILLEGAL_ACCOUNT_51));
+    let alternatives = interpolate_account(account);
+
+    assert_eq!(1, alternatives.len());
+    assert_eq!(Some(51), alternatives[0].value());
+}
+
 
 #[test]
 fn all_eight_should_interpolate_to_3_alternatives() {
