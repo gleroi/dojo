@@ -17,16 +17,16 @@ pub fn checksum(account: u32) -> bool {
 /// represents the different validity state an account number can be.
 #[derive(PartialEq, Debug)]
 pub enum ValidityState {
-    /// Valid state
+    /// Valid state:
     /// all digits are valid and the account number satisfies the checksum    
     Valid(String),
-    /// Illegale state
+    /// Illegale state:
     /// some digits are invalid, i.e not [0-9]
     Illegal(String),
-    /// Error state
+    /// Error state:
     /// all digits are valid but the account does not satisfy the checksum
     Error(String),
-    /// Maybe state
+    /// Maybe state:
     /// the readed account is either illegal or in error, and multiple alternatives 
     /// valid numbers could be determine
     Maybe(String, Vec<String>),
@@ -60,8 +60,8 @@ pub fn validate(account: &Account) -> ValidityState {
                 let description = alternatives[0].description();
                 return ValidityState::Valid(description);
             }
-            let altDescriptions = alternatives.iter().map(|altAccount: &Account| { altAccount.description() }).collect();
-            return ValidityState::Maybe(description, altDescriptions);
+            let alt_descriptions = alternatives.iter().map(|alt_account: &Account| { alt_account.description() }).collect();
+            return ValidityState::Maybe(description, alt_descriptions);
         }
     }
 }
