@@ -1,7 +1,7 @@
 use account::*;
 use checksum::*;
 
-pub fn interpolate_account(account: Account) -> Vec<Account> {
+pub fn interpolate_account(account: &Account) -> Vec<Account> {
     let mut result : Vec<Account> = Vec::new();
 
     for index in 0..ACCOUNT_LENGTH {
