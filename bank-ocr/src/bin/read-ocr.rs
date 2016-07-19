@@ -26,10 +26,9 @@ fn main() {
 }
 
 fn process_file(file: File) {
-    let entries = read_file(file);
+    let accounts = AccountFile::new(file);
 
-    for entry in &entries {
-        let account = parse(entry);
+    for account in accounts {
         let state = validate(&account);
         println!("{}", state.description());
     }

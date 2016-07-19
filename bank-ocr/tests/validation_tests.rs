@@ -16,6 +16,7 @@ fn account_51_should_be_valid() {
 }
 
 #[test]
+#[allow(non_snake_case)]
 fn account_49006771X_should_be_illegal() {
     let entry = input::convert_input(ILLEGAL_FOUR);
     let account = account::parse(&entry);
@@ -24,6 +25,7 @@ fn account_49006771X_should_be_illegal() {
 }
 
 #[test]
+#[allow(non_snake_case)]
 fn account_1234X678X_should_be_illegal() {
     let entry = input::convert_input(ILLEGAL_ONE);
     let account = account::parse(&entry);

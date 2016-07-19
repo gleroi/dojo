@@ -34,6 +34,30 @@ impl IndexMut<usize> for FileEntry {
     }
 }
 
+pub struct AccountFile {
+    reader: BufReader<File>,
+}
+
+impl AccountFile {
+    pub fn new(input: File) -> AccountFile {
+        AccountFile { reader: BufReader::new(input), }
+    }
+}
+
+use account;
+use account::Account;
+
+impl Iterator for AccountFile {
+    type Item = Account;
+
+    fn next(&mut self) -> Option<Account> {
+        if let Some(entry) = read_entry(&mut self.reader) {
+            return Some(account::parse(&entry));
+        }
+        return None;
+    }
+}
+
 pub fn read_file(input: File) -> Vec<FileEntry> {
     let mut reader = BufReader::new(input);
     let mut result : Vec<FileEntry> = Vec::new();
@@ -43,7 +67,6 @@ pub fn read_file(input: File) -> Vec<FileEntry> {
             Some(entry) => result.push(entry),
             None => done = true,
         }
-        skip_blank_line(&mut reader);
     }
     return result;
 }
@@ -66,6 +89,7 @@ fn read_entry(reader: &mut BufReader<File>) -> Option<FileEntry> {
             }
         }
     }
+    skip_blank_line(reader);    
     return Some(entry);
 }
 
