@@ -23,7 +23,6 @@ impl Console {
                 in_handle: in_handle,
                 out_handle: out_handle,
             };
-            panic!("could not AllocConsole {}", GetLastError());
         }
     }
 
