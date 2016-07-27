@@ -21,6 +21,7 @@ impl Grid {
 
 struct Position {x: i32, y: i32}
 
+#[derive(Copy, Clone)]
 enum Direction {
     Up,
     Right,
@@ -72,25 +73,63 @@ fn print_buffer(buffer: &[u8]) {
 }
 
 use std::io::Read;
+use std::thread;
+use std::sync::mpsc;
+
+const DEFAULT_DIRECTION : Direction = Direction::Up;
+
+fn run_input_thread(tx: mpsc::Sender<Direction>) {
+    let mut direction = DEFAULT_DIRECTION;
+    loop {
+        let mut data = String::new();
+        let mut input = std::io::stdin();
+        input.read_line(&mut data);
+
+        let val = data.chars().nth(0);
+
+        const UP : char = 'z';
+        const DOWN : char = 's';
+        const LEFT : char = 'q';
+        const RIGHT : char = 'd';
+
+        direction = match val {
+            Some(UP) => Direction::Up,
+            Some(DOWN) => Direction::Down,
+            Some(LEFT) => Direction::Left,
+            Some(RIGHT) => Direction::Right,
+            _ => direction,
+        };
+        match tx.send(direction) {
+            Ok(_) => {},
+            Err(error) => panic!("error on input thread: {}", error),
+        }
+    }
+}
 
 fn main() {
+
+    let (tx,rx) = mpsc::channel();
+    
+    thread::spawn(|| { run_input_thread(tx); });
+
     let grid = Grid::new();
-    let pacman = Pacman {
+    let mut pacman = Pacman {
         position: Position { x: GRID_WIDTH as i32 / 2, y: GRID_HEIGHT as i32 / 2},
-        direction: Direction::Up,
+        direction: DEFAULT_DIRECTION,
     };
-
-
     let mut buffer = [0 as u8; GRID_WIDTH * GRID_HEIGHT];
+
     loop {
-        let mut data = [0 as u8; 1];
-        let mut input = std::io::stdin();
-        input.read_exact(&mut data);
-
-        println!("{}", data[0]);
-
+        match rx.try_recv() {
+            Ok(direction) => pacman.direction = direction,
+            Err(error) => match error {
+                mpsc::TryRecvError::Empty => { /*nothing* */ },
+                mpsc::TryRecvError::Disconnected => panic!("input thread has quit!"),
+            }
+        }
         clear_buffer(&mut buffer);
         update_buffer(&mut buffer, &grid, &pacman);
         print_buffer(&buffer);
+        thread::sleep(std::time::Duration::from_millis(16));
     }
 }
