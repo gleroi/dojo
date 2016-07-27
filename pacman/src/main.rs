@@ -1,3 +1,5 @@
+mod console;
+
 #[derive(Copy, Clone)]
 enum Cell {
     Empty,
@@ -79,13 +81,11 @@ use std::sync::mpsc;
 const DEFAULT_DIRECTION : Direction = Direction::Up;
 
 fn run_input_thread(tx: mpsc::Sender<Direction>) {
+    let console = Console::current();
     let mut direction = DEFAULT_DIRECTION;
     loop {
-        let mut data = String::new();
-        let mut input = std::io::stdin();
-        input.read_line(&mut data);
 
-        let val = data.chars().nth(0);
+        let val = console.read();
 
         const UP : char = 'z';
         const DOWN : char = 's';
@@ -105,6 +105,8 @@ fn run_input_thread(tx: mpsc::Sender<Direction>) {
         }
     }
 }
+
+use console::*;
 
 fn main() {
 
