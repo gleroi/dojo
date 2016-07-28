@@ -69,6 +69,21 @@ impl ConsoleOutput {
         }
     }
 
+    fn screen_info(&self) -> CONSOLE_SCREEN_BUFFER_INFO {
+        let mut info = CONSOLE_SCREEN_BUFFER_INFO {
+            dwSize: COORD { X: 0, Y: 0 },
+            dwCursorPosition: COORD { X: 0, Y: 0 },
+            wAttributes: 0,
+            srWindow: SMALL_RECT { Top:0, Left: 0, Bottom:0, Right: 0 },
+            dwMaximumWindowSize: COORD { X: 0, Y: 0 },
+        };
+        unsafe {
+            GetConsoleScreenBufferInfo(self.out_handle, &mut info);
+        }
+
+        return info;
+    }
+
     pub fn write_rect(&self, buffer: &[u8], width: usize) {
         if buffer.len() == 0 || buffer.len() % width != 0 {
             panic!("write_rect: buffer length ({}) in not divisible by {}", buffer.len(), width);
@@ -84,7 +99,14 @@ impl ConsoleOutput {
         let iwidth : i16 = width as i16;
         let iheight = len as i16 / iwidth;
         let ptr_data : &[CHAR_INFO] = data.as_ref();
-        let mut out_rect = &mut SMALL_RECT { Top:0, Left:0, Bottom: iheight, Right: iwidth };
+
+        let info = self.screen_info();
+        let top_center = info.srWindow.Top + (info.srWindow.Bottom - info.srWindow.Top) / 2;
+        let left_center = info.srWindow.Left + (info.srWindow.Right - info.srWindow.Left) / 2;
+
+        let mut out_rect = &mut SMALL_RECT { 
+            Top: top_center - iheight / 2, Left: left_center / 2, 
+            Bottom: top_center + iheight / 2, Right: left_center + iwidth / 2 };
         unsafe {
             WriteConsoleOutputA(self.out_handle, 
                 ptr_data as *const [CHAR_INFO] as *const CHAR_INFO, 
