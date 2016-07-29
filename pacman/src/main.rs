@@ -99,6 +99,21 @@ fn run_input_thread(tx: mpsc::Sender<Direction>) {
     }
 }
 
+fn update_state(grid: &mut Grid, pacman: &mut Pacman) {
+    update_pacman_position(pacman, &grid);
+}
+
+use std::cmp::{max, min};
+
+fn update_pacman_position(pacman: &mut Pacman, grid: &Grid) {
+    let position = &mut pacman.position;
+    match pacman.direction {
+        Direction::Up => position.y = max(0, position.y - 1),
+        Direction::Down => position.y = min((GRID_HEIGHT - 1) as i32, position.y + 1),
+        Direction::Left => position.x = max(0, position.x - 1),
+        Direction::Right => position.x = min((GRID_WIDTH - 1) as i32, position.x + 1),
+    }
+}
 
 fn main() {
 
@@ -106,7 +121,7 @@ fn main() {
     
     thread::spawn(|| { run_input_thread(tx); });
 
-    let grid = Grid::new();
+    let mut grid = Grid::new();
     let mut pacman = Pacman {
         position: Position { x: GRID_WIDTH as i32 / 2, y: GRID_HEIGHT as i32 / 2},
         direction: DEFAULT_DIRECTION,
@@ -123,8 +138,9 @@ fn main() {
             }
         }
         clear_buffer(&mut buffer);
+        update_state(&mut grid, &mut pacman);
         update_buffer(&mut buffer, &grid, &pacman);
         print_buffer(&output, &buffer);
-        thread::sleep(std::time::Duration::from_millis(16));
+        thread::sleep(std::time::Duration::from_millis(128));
     }
 }
