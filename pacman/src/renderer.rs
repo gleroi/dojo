@@ -19,10 +19,10 @@ pub struct ConsoleRenderer {
 
 impl ConsoleRenderer {
     pub fn new(width: usize, height: usize) -> ConsoleRenderer {
-        ConsoleRenderer { 
-            buffer: Vec::with_capacity(width * height),
+        ConsoleRenderer {
+            buffer: vec![EMPTY; width * height],
             output: ConsoleOutput::current(),
-         }
+        }
     }
 
     fn clear_buffer(buffer: &mut [CHAR_INFO]) {
@@ -31,7 +31,7 @@ impl ConsoleRenderer {
         }
     }
 
-    fn update_buffer(buffer: &mut [CHAR_INFO], grid: &Grid, pacman: &Pacman) {
+    fn update_buffer(buffer: &mut [CHAR_INFO], grid: &Map, pacman: &Pacman) {
         for position in 0..GRID_HEIGHT * GRID_WIDTH {
             match grid.cells[position] {
                 Cell::Empty => {
@@ -60,7 +60,7 @@ impl ConsoleRenderer {
         buffer[position].Attributes |= FOREGROUND_WHITE;
     }
 
-     fn print_buffer(output: &ConsoleOutput, buffer: &[CHAR_INFO]) {
+    fn print_buffer(output: &ConsoleOutput, buffer: &[CHAR_INFO]) {
         output.write_rect(buffer, GRID_WIDTH);
     }
 }
@@ -68,7 +68,7 @@ impl ConsoleRenderer {
 use Render;
 
 impl Render for ConsoleRenderer {
-    fn update(&mut self, grid: &Grid, pacman: &Pacman) {
+    fn update(&mut self, grid: &Map, pacman: &Pacman) {
         ConsoleRenderer::clear_buffer(&mut self.buffer);
         ConsoleRenderer::update_buffer(&mut self.buffer, grid, pacman);
     }

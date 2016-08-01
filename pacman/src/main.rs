@@ -38,8 +38,7 @@ fn run_input_thread(tx: mpsc::Sender<Direction>) {
     }
 }
 
-
-fn update_state(grid: &mut Grid, pacman: &mut Pacman, timer: &mut Instant) {
+fn update_state(grid: &mut Map, pacman: &mut Pacman, timer: &mut Instant) {
     let horizontal_time_slice = Duration::from_millis(64);
     let vertival_time_slice = horizontal_time_slice * 2;
 
@@ -58,7 +57,7 @@ fn update_state(grid: &mut Grid, pacman: &mut Pacman, timer: &mut Instant) {
 
 use std::cmp::{max, min};
 
-fn update_pacman_position(pacman: &mut Pacman, grid: &Grid) {
+fn update_pacman_position(pacman: &mut Pacman, grid: &Map) {
     let position = &mut pacman.position;
     match pacman.direction {
         Direction::Up => position.y = max(0, position.y - 1),
@@ -71,7 +70,7 @@ fn update_pacman_position(pacman: &mut Pacman, grid: &Grid) {
 use std::time::{Instant, Duration};
 
 trait Render {
-    fn update(&mut self, grid: &Grid, pacman: &Pacman);
+    fn update(&mut self, grid: &Map, pacman: &Pacman);
     fn render(&mut self);
 }
 
@@ -83,7 +82,7 @@ fn main() {
         run_input_thread(tx);
     });
 
-    let mut grid = Grid::new();
+    let mut grid = Map::new();
     let mut pacman = Pacman {
         position: Position {
             x: GRID_WIDTH as i32 / 2,
@@ -108,7 +107,7 @@ fn main() {
             }
         }
         update_state(&mut grid, &mut pacman, &mut timer);
-        
+
         renderer.update(&grid, &pacman);
         renderer.render();
     }
