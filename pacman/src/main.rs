@@ -40,30 +40,30 @@ struct Gum {
     position: Position,
 }
 
-fn clear_buffer(buffer: &mut [u8]) {
+fn clear_buffer(buffer: &mut [char]) {
     for it in buffer {
-        *it = 0;
+        *it = ' ';
     }
 }
 
-fn update_buffer(buffer: &mut [u8], grid: &Grid, pacman: &Pacman) {
+fn update_buffer(buffer: &mut [char], grid: &Grid, pacman: &Pacman) {
     for position in 0..GRID_HEIGHT * GRID_WIDTH {
         match grid.cells[position] {
-            Cell::Empty => buffer[position] = ' ' as u8,
-            Cell::Wall => buffer[position] = '|' as u8,
+            Cell::Empty => buffer[position] = ' ',
+            Cell::Wall => buffer[position] = '|',
         }
     }
 
     let position = (pacman.position.y as usize * GRID_WIDTH + pacman.position.x as usize) as usize;
     buffer[position] = match pacman.direction {
-        Direction::Down => 'W' as u8,
-        Direction::Left => '3' as u8,
-        Direction::Up => 'V' as u8,
-        Direction::Right => 'K' as u8,
+        Direction::Down => '\u{1F601}',
+        Direction::Left => '3',
+        Direction::Up => 'V',
+        Direction::Right => 'K',
     }
 }
 
-fn print_buffer(output: &ConsoleOutput, buffer: &[u8]) {
+fn print_buffer(output: &ConsoleOutput, buffer: &[char]) {
     output.write_rect(buffer, GRID_WIDTH);
 }
 
@@ -142,7 +142,7 @@ fn main() {
         position: Position { x: GRID_WIDTH as i32 / 2, y: GRID_HEIGHT as i32 / 2},
         direction: DEFAULT_DIRECTION,
     };
-    let mut buffer = [0 as u8; GRID_WIDTH * GRID_HEIGHT];
+    let mut buffer = [0 as char; GRID_WIDTH * GRID_HEIGHT];
     let output = ConsoleOutput::current();
     let mut timer = Instant::now();
 

@@ -59,11 +59,11 @@ impl ConsoleOutput {
         }
     }
 
-    pub fn write(&self, buffer: &[u8]) {
+    pub fn write(&self, buffer: &[char]) {
         let mut written = 0;
         unsafe {
-            let ptr_buffer = buffer as *const [u8] as *mut c_void; 
-            if WriteConsoleA(self.out_handle, ptr_buffer, buffer.len() as u32, &mut written, null_mut()) == 0 {
+            let ptr_buffer = buffer as *const [char] as *mut c_void; 
+            if WriteConsoleW(self.out_handle, ptr_buffer, buffer.len() as u32, &mut written, null_mut()) == 0 {
                 panic!("console output: could not write: {0}", GetLastError());
             }
         }
@@ -84,7 +84,7 @@ impl ConsoleOutput {
         return info;
     }
 
-    pub fn write_rect(&self, buffer: &[u8], width: usize) {
+    pub fn write_rect(&self, buffer: &[char], width: usize) {
         if buffer.len() == 0 || buffer.len() % width != 0 {
             panic!("write_rect: buffer length ({}) in not divisible by {}", buffer.len(), width);
         }
@@ -108,7 +108,7 @@ impl ConsoleOutput {
             Top: top_center - iheight / 2, Left: left_center / 2, 
             Bottom: top_center + iheight / 2, Right: left_center + iwidth / 2 };
         unsafe {
-            WriteConsoleOutputA(self.out_handle, 
+            WriteConsoleOutputW(self.out_handle, 
                 ptr_data as *const [CHAR_INFO] as *const CHAR_INFO, 
                 COORD { X: iwidth, Y: iheight },
                 COORD { X: 0, Y: 0 },
