@@ -1,6 +1,7 @@
 use console::*;
 
 use game::*;
+use map::*;
 
 const FOREGROUND_WHITE: u16 = (FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN |
                                FOREGROUND_BLUE) as u16;
@@ -16,6 +17,7 @@ const EMPTY: CHAR_INFO = CHAR_INFO {
 pub struct ConsoleRenderer {
     output: ConsoleOutput,
     buffer: Vec<CHAR_INFO>,
+    width: usize,
 }
 
 impl ConsoleRenderer {
@@ -23,6 +25,7 @@ impl ConsoleRenderer {
         ConsoleRenderer {
             buffer: vec![EMPTY; width * height],
             output: ConsoleOutput::current(),
+            width: width,
         }
     }
 
@@ -32,9 +35,9 @@ impl ConsoleRenderer {
         }
     }
 
-    fn update_buffer(buffer: &mut [CHAR_INFO], grid: &Map, pacman: &Pacman) {
+    fn update_buffer(buffer: &mut [CHAR_INFO], map: &Map, pacman: &Pacman) {
         for position in 0..buffer.len() {
-            match grid.cells[position] {
+            match map.cells[position] {
                 Cell::Empty => {
                     buffer[position] = CHAR_INFO {
                         UnicodeChar: ' ' as u16,
@@ -50,7 +53,7 @@ impl ConsoleRenderer {
             }
         }
 
-        let position = (pacman.position.y as usize * GRID_WIDTH +
+        let position = (pacman.position.y as usize * map.width +
                         pacman.position.x as usize) as usize;
         buffer[position].UnicodeChar = match pacman.direction {
             Direction::Down => 'A',
@@ -61,8 +64,8 @@ impl ConsoleRenderer {
         buffer[position].Attributes |= FOREGROUND_WHITE;
     }
 
-    fn print_buffer(output: &ConsoleOutput, buffer: &[CHAR_INFO]) {
-        output.write_rect(buffer, GRID_WIDTH);
+    fn print_buffer(output: &ConsoleOutput, buffer: &[CHAR_INFO], width: usize) {
+        output.write_rect(buffer, width);
     }
 }
 
@@ -75,6 +78,6 @@ impl Render for ConsoleRenderer {
     }
 
     fn render(&mut self) {
-        ConsoleRenderer::print_buffer(&self.output, &self.buffer);
+        ConsoleRenderer::print_buffer(&self.output, &self.buffer, self.width);
     }
 }

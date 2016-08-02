@@ -1,7 +1,7 @@
 mod console;
 mod game;
 mod renderer;
-
+mod map;
 
 use std::thread;
 use std::sync::mpsc;
@@ -57,7 +57,7 @@ fn main() {
         run_input_thread(tx, default_direction);
     });
 
-    let mut renderer = ConsoleRenderer::new(GRID_WIDTH, GRID_HEIGHT);
+    let mut renderer = ConsoleRenderer::new(game_state.map.width, game_state.map.height);
     let mut timer = Instant::now();
 
     loop {
