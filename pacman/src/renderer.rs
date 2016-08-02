@@ -6,6 +6,7 @@ const FOREGROUND_WHITE: u16 = (FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUN
                                FOREGROUND_BLUE) as u16;
 const BACKGROUND_WHITE: u16 = (BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN |
                                BACKGROUND_BLUE) as u16;
+const BACKGROUND_GRAY: u16 = (BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE) as u16;
 
 const EMPTY: CHAR_INFO = CHAR_INFO {
     UnicodeChar: 0,
@@ -43,7 +44,7 @@ impl ConsoleRenderer {
                 Cell::Wall => {
                     buffer[position] = CHAR_INFO {
                         UnicodeChar: ' ' as u16,
-                        Attributes: BACKGROUND_WHITE,
+                        Attributes: BACKGROUND_GRAY,
                     }
                 }
             }
