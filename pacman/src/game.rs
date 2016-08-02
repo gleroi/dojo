@@ -152,7 +152,7 @@ impl GameState {
         };
     }
 
-    fn update_state(grid: &mut Map, pacman: &mut Pacman, timer: &Instant) -> bool {
+    fn update_state(map: &mut Map, pacman: &mut Pacman, timer: &Instant) -> bool {
         let horizontal_time_slice = Duration::from_millis(64);
         let vertival_time_slice = horizontal_time_slice * 2;
 
@@ -163,12 +163,12 @@ impl GameState {
             _ => false,
         };
         if update {
-            GameState::update_pacman_position(pacman, &grid);
+            GameState::update_pacman_position(pacman, &map);
         }
         return update;
     }
 
-    fn update_pacman_position(pacman: &mut Pacman, grid: &Map) {
+    fn update_pacman_position(pacman: &mut Pacman, map: &Map) {
         let position = &mut pacman.position;
         match pacman.direction {
             Direction::Up => position.y = max(0, position.y - 1),

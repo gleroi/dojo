@@ -62,7 +62,7 @@ impl ConsoleOutput {
             return ConsoleOutput { out_handle: out_handle };
         }
     }
-    
+
     fn screen_info(&self) -> CONSOLE_SCREEN_BUFFER_INFO {
         let mut info = CONSOLE_SCREEN_BUFFER_INFO {
             dwSize: COORD { X: 0, Y: 0 },
@@ -98,7 +98,7 @@ impl ConsoleOutput {
         let top_center = info.srWindow.Top + (info.srWindow.Bottom - info.srWindow.Top) / 2;
         let left_center = info.srWindow.Left + (info.srWindow.Right - info.srWindow.Left) / 2;
 
-        let mut out_rect = &mut SMALL_RECT {
+        let out_rect = &mut SMALL_RECT {
             Top: top_center - iheight / 2,
             Left: left_center - iwidth / 2,
             Bottom: top_center + iheight / 2,
