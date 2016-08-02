@@ -66,12 +66,15 @@ impl GameState {
     }
 
     fn update_pacman_position(pacman: &mut Pacman, map: &Map) {
-        let position = &mut pacman.position;
-        match pacman.direction {
-            Direction::Up => position.y = max(0, position.y - 1),
-            Direction::Down => position.y = min((map.height - 1) as i32, position.y + 1),
-            Direction::Left => position.x = max(0, position.x - 1),
-            Direction::Right => position.x = min((map.width - 1) as i32, position.x + 1),
+        let new_position = match pacman.direction {
+            Direction::Up => Position { y: max(0, pacman.position.y - 1), ..pacman.position },
+            Direction::Down => Position { y: min((map.height - 1) as i32, pacman.position.y + 1), ..pacman.position },
+            Direction::Left => Position { x: max(0, pacman.position.x - 1), ..pacman.position },
+            Direction::Right => Position { x: min((map.width - 1) as i32, pacman.position.x + 1), ..pacman.position },
+        };
+        let map_position = (new_position.y * map.width as i32 + new_position.x) as usize;
+        if map.cells[map_position] == Cell::Empty {
+            pacman.position = new_position;
         }
     }
 }
@@ -121,7 +124,7 @@ mod tests {
     fn pacman_cannot_traverse_walls() {
         let mut map = Map::new(3, 3);
         for index in 0..9 {
-            if index != 5 {
+            if index != 4 {
                 map.cells[index] = Cell::Wall;
             }
         }
