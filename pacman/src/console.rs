@@ -114,7 +114,7 @@ impl ConsoleOutput {
 
         let mut out_rect = &mut SMALL_RECT {
             Top: top_center - iheight / 2,
-            Left: left_center / 2,
+            Left: left_center - iwidth / 2,
             Bottom: top_center + iheight / 2,
             Right: left_center + iwidth / 2,
         };

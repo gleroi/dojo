@@ -33,7 +33,7 @@ impl ConsoleRenderer {
     }
 
     fn update_buffer(buffer: &mut [CHAR_INFO], grid: &Map, pacman: &Pacman) {
-        for position in 0..GRID_HEIGHT * GRID_WIDTH {
+        for position in 0..buffer.len() {
             match grid.cells[position] {
                 Cell::Empty => {
                     buffer[position] = CHAR_INFO {
