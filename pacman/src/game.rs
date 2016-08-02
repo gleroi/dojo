@@ -1,5 +1,6 @@
 use map::*;
 
+#[derive(PartialEq, Debug)]
 pub struct Position {
     pub x: i32,
     pub y: i32,
@@ -34,7 +35,7 @@ const DEFAULT_DIRECTION: Direction = Direction::Up;
 
 impl GameState {
     pub fn new() -> GameState {
-        let grid = Map::new();
+        let grid = Map::new_default();
         let pacman = Pacman {
             position: Position {
                 x: grid.width as i32 / 2,
@@ -83,5 +84,63 @@ impl GameUpdate for GameState {
             self.pacman.direction = direction;
         }
         GameState::update_state(&mut self.map, &mut self.pacman, timer)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use map::*;
+    use super::*;
+
+    #[test]
+    fn pacman_cannot_leave_map() {
+        let map = Map::new(1, 1);
+        let mut pacman = Pacman {
+            position: Position { x: 0, y: 0 },
+            direction: Direction::Up,
+        };
+
+        pacman.direction = Direction::Up;
+        GameState::update_pacman_position(&mut pacman, &map);
+        assert_eq!(pacman.position, Position { x: 0, y: 0 });
+
+        pacman.direction = Direction::Down;
+        GameState::update_pacman_position(&mut pacman, &map);
+        assert_eq!(pacman.position, Position { x: 0, y: 0 });
+
+        pacman.direction = Direction::Left;
+        GameState::update_pacman_position(&mut pacman, &map);
+        assert_eq!(pacman.position, Position { x: 0, y: 0 });
+
+        pacman.direction = Direction::Right;
+        GameState::update_pacman_position(&mut pacman, &map);
+        assert_eq!(pacman.position, Position { x: 0, y: 0 });
+    }
+
+    #[test]
+    fn pacman_cannot_traverse_walls() {
+        let mut map = Map::new(3, 3);
+        for index in 0..9 {
+            if index != 5 {
+                map.cells[index] = Cell::Wall;
+            }
+        }
+        let mut pacman = Pacman { position: Position { x: 1, y: 1}, direction: Direction::Up };
+
+        pacman.direction = Direction::Up;
+        GameState::update_pacman_position(&mut pacman, &map);
+        assert_eq!(pacman.position, Position { x: 1, y: 1 });
+
+        pacman.direction = Direction::Down;
+        GameState::update_pacman_position(&mut pacman, &map);
+        assert_eq!(pacman.position, Position { x: 1, y: 1 });
+
+        pacman.direction = Direction::Left;
+        GameState::update_pacman_position(&mut pacman, &map);
+        assert_eq!(pacman.position, Position { x: 1, y: 1 });
+
+        pacman.direction = Direction::Right;
+        GameState::update_pacman_position(&mut pacman, &map);
+        assert_eq!(pacman.position, Position { x: 1, y: 1 });
     }
 }

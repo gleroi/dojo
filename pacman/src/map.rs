@@ -86,21 +86,27 @@ static DEFAULT_MAP: [char; GRID_HEIGHT * GRID_WIDTH] =
      '_', '_'];
 
 pub struct Map {
-    pub cells: [Cell; GRID_HEIGHT * GRID_WIDTH],
+    pub cells: Vec<Cell>,
     pub width: usize,
     pub height: usize,
 }
 
 impl Map {
-    pub fn new() -> Map {
-        let mut map = Map { cells: [Cell::Empty; GRID_HEIGHT * GRID_WIDTH], width: GRID_WIDTH, height: GRID_HEIGHT };
+    pub fn new_default() -> Map {
+        let mut map = Map::new(GRID_WIDTH, GRID_HEIGHT);
         for (index, &character) in DEFAULT_MAP.iter().enumerate() {
+            println!("{}", index);
             map.cells[index] = match character {
                 '_' => Cell::Wall,
                 ' ' => Cell::Empty,
                 _ => panic!("Map: invalid map format"),
             }
         }
+        return map;
+    }
+
+    pub fn new(width: usize, height: usize) -> Map {
+        let mut map = Map { cells: vec![Cell::Empty; width * height], width: width, height: height };
         return map;
     }
 }
