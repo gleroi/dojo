@@ -38,34 +38,6 @@ fn run_input_thread(tx: mpsc::Sender<Direction>) {
     }
 }
 
-fn update_state(grid: &mut Map, pacman: &mut Pacman, timer: &mut Instant) {
-    let horizontal_time_slice = Duration::from_millis(64);
-    let vertival_time_slice = horizontal_time_slice * 2;
-
-    let elapsed = timer.elapsed();
-    let update = match pacman.direction {
-        Direction::Up | Direction::Down if elapsed > vertival_time_slice => true,
-        Direction::Left | Direction::Right if elapsed > horizontal_time_slice => true,
-        _ => false,
-    };
-    if update {
-        update_pacman_position(pacman, &grid);
-
-        *timer = Instant::now();
-    }
-}
-
-use std::cmp::{max, min};
-
-fn update_pacman_position(pacman: &mut Pacman, grid: &Map) {
-    let position = &mut pacman.position;
-    match pacman.direction {
-        Direction::Up => position.y = max(0, position.y - 1),
-        Direction::Down => position.y = min((GRID_HEIGHT - 1) as i32, position.y + 1),
-        Direction::Left => position.x = max(0, position.x - 1),
-        Direction::Right => position.x = min((GRID_WIDTH - 1) as i32, position.x + 1),
-    }
-}
 
 use std::time::{Instant, Duration};
 
@@ -106,9 +78,11 @@ fn main() {
                 }
             }
         }
-        update_state(&mut grid, &mut pacman, &mut timer);
 
-        renderer.update(&grid, &pacman);
-        renderer.render();
+        if update_state(&mut grid, &mut pacman, &timer) {
+            renderer.update(&grid, &pacman);
+            renderer.render();
+            timer = Instant::now();
+        }
     }
 }
