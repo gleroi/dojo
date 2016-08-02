@@ -69,9 +69,9 @@ impl ConsoleRenderer {
 use Render;
 
 impl Render for ConsoleRenderer {
-    fn update(&mut self, grid: &Map, pacman: &Pacman) {
+    fn update(&mut self, state: &GameState) {
         ConsoleRenderer::clear_buffer(&mut self.buffer);
-        ConsoleRenderer::update_buffer(&mut self.buffer, grid, pacman);
+        ConsoleRenderer::update_buffer(&mut self.buffer, &state.map, &state.pacman);
     }
 
     fn render(&mut self) {

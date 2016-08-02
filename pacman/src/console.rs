@@ -62,21 +62,7 @@ impl ConsoleOutput {
             return ConsoleOutput { out_handle: out_handle };
         }
     }
-
-    pub fn write(&self, buffer: &[char]) {
-        let mut written = 0;
-        unsafe {
-            let ptr_buffer = buffer as *const [char] as *mut c_void;
-            if WriteConsoleW(self.out_handle,
-                             ptr_buffer,
-                             buffer.len() as u32,
-                             &mut written,
-                             null_mut()) == 0 {
-                panic!("console output: could not write: {0}", GetLastError());
-            }
-        }
-    }
-
+    
     fn screen_info(&self) -> CONSOLE_SCREEN_BUFFER_INFO {
         let mut info = CONSOLE_SCREEN_BUFFER_INFO {
             dwSize: COORD { X: 0, Y: 0 },
