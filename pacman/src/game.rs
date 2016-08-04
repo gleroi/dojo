@@ -6,6 +6,23 @@ pub struct Position {
     pub y: i32,
 }
 
+impl Position {
+    fn new(x: i32, y: i32) -> Position {
+        Position {x: x, y: y}
+    }
+
+    fn from_map_index(map: &Map, index: usize) -> Position {
+        Position {
+            x: (index % map.width) as i32,
+            y: (index / map.width) as i32,
+        }
+    }
+
+    pub fn to_map_index(&self, map: &Map) -> usize {
+        return self.y as usize * map.width + self.x as usize;
+    }
+}
+
 #[derive(Copy, Clone)]
 pub enum Direction {
     Up,
@@ -20,12 +37,13 @@ pub struct Pacman {
 }
 
 pub struct Gum {
-    position: Position,
+    pub position: Position,
 }
 
 pub struct GameState {
     pub map: Map,
     pub pacman: Pacman,
+    pub gums: Vec<Gum>,
 }
 
 use std::time::{Instant, Duration};
@@ -43,26 +61,17 @@ impl GameState {
             },
             direction: DEFAULT_DIRECTION,
         };
+        let mut gums : Vec<Gum> = Vec::new();
+        for (index, &cell) in grid.cells.iter().enumerate() {
+            if cell == Cell::Empty && index % 3 == 0 {
+                gums.push(Gum { position: Position::from_map_index(&grid, index) });
+            }
+        }
         return GameState {
             map: grid,
             pacman: pacman,
+            gums: gums,
         };
-    }
-
-    fn update_state(map: &mut Map, pacman: &mut Pacman, timer: &Instant) -> bool {
-        let horizontal_time_slice = Duration::from_millis(64);
-        let vertival_time_slice = horizontal_time_slice * 2;
-
-        let elapsed = timer.elapsed();
-        let update = match pacman.direction {
-            Direction::Up | Direction::Down if elapsed > vertival_time_slice => true,
-            Direction::Left | Direction::Right if elapsed > horizontal_time_slice => true,
-            _ => false,
-        };
-        if update {
-            GameState::update_pacman_position(pacman, &map);
-        }
-        return update;
     }
 
     fn update_pacman_position(pacman: &mut Pacman, map: &Map) {
@@ -72,10 +81,14 @@ impl GameState {
             Direction::Left => Position { x: max(0, pacman.position.x - 1), ..pacman.position },
             Direction::Right => Position { x: min((map.width - 1) as i32, pacman.position.x + 1), ..pacman.position },
         };
-        let map_position = (new_position.y * map.width as i32 + new_position.x) as usize;
+        let map_position = new_position.to_map_index(map);
         if map.cells[map_position] == Cell::Empty {
             pacman.position = new_position;
         }
+    }
+
+    fn update_gums(gums: &mut Vec<Gum>, pacman: &Pacman) {
+        gums.retain(|ref gum| gum.position != pacman.position);
     }
 }
 
@@ -86,7 +99,21 @@ impl GameUpdate for GameState {
         if let Some(direction) = new_direction {
             self.pacman.direction = direction;
         }
-        GameState::update_state(&mut self.map, &mut self.pacman, timer)
+
+        let horizontal_time_slice = Duration::from_millis(64);
+        let vertival_time_slice = horizontal_time_slice * 2;
+        let elapsed = timer.elapsed();
+        let update = match self.pacman.direction {
+            Direction::Up | Direction::Down if elapsed > vertival_time_slice => true,
+            Direction::Left | Direction::Right if elapsed > horizontal_time_slice => true,
+            _ => false,
+        };
+
+        if update {
+            GameState::update_pacman_position(&mut self.pacman, &self.map);
+            GameState::update_gums(&mut self.gums, &self.pacman);
+        }
+        return update;
     }
 }
 
@@ -145,5 +172,39 @@ mod tests {
         pacman.direction = Direction::Right;
         GameState::update_pacman_position(&mut pacman, &map);
         assert_eq!(pacman.position, Position { x: 1, y: 1 });
+    }
+
+    #[test]
+    fn pacman_eat_gum_when_on_it() {
+        let mut map = Map::new(3,3);
+        let mut pacman = Pacman { position: Position {x:1, y: 1}, direction: Direction::Up };
+        let mut gums : Vec<Gum> = Vec::with_capacity(8);
+        for index in 0..9 {
+            if index != 4 {
+                gums.push(Gum { position: Position::from_map_index(&map, index) });
+            }
+        }
+
+        let gums_count = gums.len();
+
+        pacman.position = Position::new(1, 1);
+        GameState::update_gums(&mut gums, &pacman);
+        assert_eq!(gums_count, gums.len());
+
+        pacman.position = Position::new(1, 0);
+        GameState::update_gums(&mut gums, &pacman);
+        assert_eq!(gums_count - 1, gums.len());
+
+        pacman.position = Position::new(1, 2);
+        GameState::update_gums(&mut gums, &pacman);
+        assert_eq!(gums_count - 2, gums.len());
+
+        pacman.position = Position::new(0, 1);
+        GameState::update_gums(&mut gums, &pacman);
+        assert_eq!(gums_count - 3, gums.len());
+
+        pacman.position = Position::new(2, 1);
+        GameState::update_gums(&mut gums, &pacman);
+        assert_eq!(gums_count - 4, gums.len());
     }
 }

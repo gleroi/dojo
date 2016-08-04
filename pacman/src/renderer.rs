@@ -5,8 +5,11 @@ use map::*;
 
 const FOREGROUND_WHITE: u16 = (FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN |
                                FOREGROUND_BLUE) as u16;
+const FOREGROUND_YELLOW: u16 = (FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN) as u16;
+
 const BACKGROUND_WHITE: u16 = (BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN |
                                BACKGROUND_BLUE) as u16;
+
 const BACKGROUND_GRAY: u16 = (BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE) as u16;
 
 const EMPTY: CHAR_INFO = CHAR_INFO {
@@ -35,7 +38,8 @@ impl ConsoleRenderer {
         }
     }
 
-    fn update_buffer(buffer: &mut [CHAR_INFO], map: &Map, pacman: &Pacman) {
+    fn update_buffer(buffer: &mut [CHAR_INFO], state: &GameState) {
+        let map = &state.map;
         for position in 0..buffer.len() {
             match map.cells[position] {
                 Cell::Empty => {
@@ -53,6 +57,7 @@ impl ConsoleRenderer {
             }
         }
 
+        let pacman = &state.pacman;
         let position = (pacman.position.y as usize * map.width +
                         pacman.position.x as usize) as usize;
         buffer[position].UnicodeChar = match pacman.direction {
@@ -61,7 +66,14 @@ impl ConsoleRenderer {
             Direction::Up => 'V',
             Direction::Right => 'C',
         } as u16;
-        buffer[position].Attributes |= FOREGROUND_WHITE;
+        buffer[position].Attributes |= FOREGROUND_YELLOW;
+
+        let gums = &state.gums;
+        for gum in gums {
+            let map_index = gum.position.to_map_index(map);
+            buffer[map_index].UnicodeChar = '.' as u16;
+            buffer[map_index].Attributes |= FOREGROUND_WHITE;
+        }
     }
 
     fn print_buffer(output: &ConsoleOutput, buffer: &[CHAR_INFO], width: usize) {
@@ -74,7 +86,7 @@ use Render;
 impl Render for ConsoleRenderer {
     fn update(&mut self, state: &GameState) {
         ConsoleRenderer::clear_buffer(&mut self.buffer);
-        ConsoleRenderer::update_buffer(&mut self.buffer, &state.map, &state.pacman);
+        ConsoleRenderer::update_buffer(&mut self.buffer, &state);
     }
 
     fn render(&mut self) {
