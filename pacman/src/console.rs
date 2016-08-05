@@ -126,17 +126,4 @@ impl ConsoleOutput {
                                 out_rect);
         }
     }
-
-    pub fn clear(&self) {
-        let info = self.screen_info().srWindow;
-        let len = ((info.Right - info.Left) * (info.Bottom - info.Top)) as u32;
-        let origin = COORD { X: info.Left, Y: info.Top };
-        let mut written : u32 = 0;
-        unsafe {
-            FillConsoleOutputCharacterW(self.out_handle,
-                ' ' as u16, len, origin, &mut written);
-            FillConsoleOutputAttribute(self.out_handle,
-                0, len, origin, &mut written);
-        }
-    }
 }

@@ -109,7 +109,7 @@ impl GameState {
     fn update_gums(gums: &mut Vec<Gum>, pacman: &Pacman) -> bool {
         let len = gums.len();        
         gums.retain(|ref gum| gum.position != pacman.position);
-        return len == gums.len();
+        return len != gums.len();
     }
 }
 

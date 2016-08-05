@@ -47,6 +47,20 @@ impl ConsoleRenderer {
         }
     }
 
+    fn update_score(&mut self, state: &GameState) {
+        self.write_at(&Position::new(0, 0), &format!("SCORE: {}", state.score), (FOREGROUND_INTENSITY | FOREGROUND_RED) as u16);
+    }
+
+    fn write_at(&mut self, start: &Position, str: &str, attributes: u16) {
+        let mut position = Position::new(start.x, start.y);
+        for character in str.chars() {
+            let index = position.to_map_index(&self.size);
+            self.buffer[index].UnicodeChar = character as u16;
+            self.buffer[index].Attributes = attributes;
+            position.x += 1;
+        }
+    }
+
     fn update_map(&mut self, state: &GameState) {
         let map = &state.map;
         let buffer = &mut self.buffer;
@@ -104,6 +118,7 @@ impl Render for ConsoleRenderer {
     fn update(&mut self, state: &GameState) {
         ConsoleRenderer::clear_buffer(&mut self.buffer);
         self.update_map(&state);
+        self.update_score(&state);
     }
 
     fn render(&mut self) {
