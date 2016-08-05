@@ -55,7 +55,7 @@ impl ConsoleRenderer {
 
         for map_index in 0..map.cells.len() {
             let map_pos = Position::from_map_index(&map.size, map_index);
-            let buffer_pos = Position::new(map_origin.x + map_pos.x, map_origin.y + map_pos.y);
+            let buffer_pos = &map_origin + &map_pos;
             let position = buffer_pos.to_map_index(&self.size);
             match map.cells[map_index] {
                 Cell::Empty => {
@@ -74,9 +74,8 @@ impl ConsoleRenderer {
         }
 
         let pacman = &state.pacman;
-        let pacman_pos = Position::new(map_origin.x + pacman.position.x, map_origin.y + pacman.position.y);
-        let position = (pacman_pos.y as usize * self.width +
-                        pacman_pos.x as usize) as usize;
+        let pacman_pos = &map_origin + &pacman.position;
+        let position = pacman_pos.to_map_index(&self.size);
         buffer[position].UnicodeChar = match pacman.direction {
             Direction::Down => 'A',
             Direction::Left => 'D',
@@ -87,8 +86,8 @@ impl ConsoleRenderer {
 
         let gums = &state.gums;
         for gum in gums {
-            let gum_pos = Position::new(map_origin.x + gum.position.x, map_origin.y + gum.position.y);
-            let map_index = gum_pos.y as usize * self.width + gum_pos.x as usize;
+            let gum_pos = &map_origin + &gum.position;
+            let map_index = gum_pos.to_map_index(&self.size);
             buffer[map_index].UnicodeChar = '.' as u16;
             buffer[map_index].Attributes |= FOREGROUND_WHITE;
         }

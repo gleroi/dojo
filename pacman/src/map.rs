@@ -108,7 +108,8 @@ impl Map {
     }
 
     pub fn new(width: usize, height: usize) -> Map {
-        let mut map = Map { cells: vec![Cell::Empty; width * height], 
+        let map = Map { 
+            cells: vec![Cell::Empty; width * height], 
             width: width, height: height,
             size: Size { width: width as u32, height: height as u32 } 
         };

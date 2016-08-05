@@ -23,6 +23,16 @@ impl Position {
     }
 }
 
+use std::ops::Add;
+
+impl <'a,'b> Add<&'b Position> for &'a Position {
+    type Output = Position;
+
+    fn add(self, rhs: &'b Position) -> Position {
+        Position { x: self.x + rhs.x, y: self.y + rhs.y }
+    }
+}
+
 pub struct Size {
     pub width: u32,
     pub height: u32,
