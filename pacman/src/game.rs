@@ -7,11 +7,11 @@ pub struct Position {
 }
 
 impl Position {
-    fn new(x: i32, y: i32) -> Position {
+    pub fn new(x: i32, y: i32) -> Position {
         Position {x: x, y: y}
     }
 
-    fn from_map_index(map: &Map, index: usize) -> Position {
+    pub fn from_map_index(map: &Map, index: usize) -> Position {
         Position {
             x: (index % map.width) as i32,
             y: (index / map.width) as i32,
@@ -36,6 +36,7 @@ pub struct Pacman {
     pub direction: Direction,
 }
 
+const GUM_SCORE : i32 = 10;
 pub struct Gum {
     pub position: Position,
 }
@@ -44,6 +45,7 @@ pub struct GameState {
     pub map: Map,
     pub pacman: Pacman,
     pub gums: Vec<Gum>,
+    pub score: i32,
 }
 
 use std::time::{Instant, Duration};
@@ -71,6 +73,7 @@ impl GameState {
             map: grid,
             pacman: pacman,
             gums: gums,
+            score: 0,
         };
     }
 
@@ -87,8 +90,10 @@ impl GameState {
         }
     }
 
-    fn update_gums(gums: &mut Vec<Gum>, pacman: &Pacman) {
+    fn update_gums(gums: &mut Vec<Gum>, pacman: &Pacman) -> bool {
+        let len = gums.len();        
         gums.retain(|ref gum| gum.position != pacman.position);
+        return len == gums.len();
     }
 }
 
@@ -111,7 +116,9 @@ impl GameUpdate for GameState {
 
         if update {
             GameState::update_pacman_position(&mut self.pacman, &self.map);
-            GameState::update_gums(&mut self.gums, &self.pacman);
+            if GameState::update_gums(&mut self.gums, &self.pacman) {
+                self.score += GUM_SCORE;
+            }
         }
         return update;
     }

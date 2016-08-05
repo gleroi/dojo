@@ -95,7 +95,6 @@ impl Map {
     pub fn new_default() -> Map {
         let mut map = Map::new(GRID_WIDTH, GRID_HEIGHT);
         for (index, &character) in DEFAULT_MAP.iter().enumerate() {
-            println!("{}", index);
             map.cells[index] = match character {
                 '_' => Cell::Wall,
                 ' ' => Cell::Empty,

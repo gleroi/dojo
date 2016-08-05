@@ -57,7 +57,7 @@ fn main() {
         run_input_thread(tx, default_direction);
     });
 
-    let mut renderer = ConsoleRenderer::new(game_state.map.width, game_state.map.height);
+    let mut renderer = ConsoleRenderer::new();
     let mut timer = Instant::now();
 
     loop {

@@ -52,6 +52,11 @@ pub struct ConsoleOutput {
     out_handle: HANDLE,
 }
 
+pub struct Size {
+    pub width: u32,
+    pub height: u32,
+}
+
 use std::os::raw::c_void;
 use std::ptr::null_mut;
 
@@ -83,6 +88,16 @@ impl ConsoleOutput {
         return info;
     }
 
+    pub fn screen_size(&self) -> Size {
+        let info = self.screen_info();
+        let window = &info.srWindow;
+        return Size {
+            width: (window.Right - window.Left) as u32,
+            height: (window.Bottom - window.Top) as u32,
+        }
+    }
+
+
     pub fn write_rect(&self, buffer: &[CHAR_INFO], width: usize) {
         if buffer.len() == 0 || buffer.len() % width != 0 {
             panic!("write_rect: buffer length ({}) in not divisible by {}",
@@ -113,6 +128,19 @@ impl ConsoleOutput {
                                 },
                                 COORD { X: 0, Y: 0 },
                                 out_rect);
+        }
+    }
+
+    pub fn clear(&self) {
+        let info = self.screen_info().srWindow;
+        let len = ((info.Right - info.Left) * (info.Bottom - info.Top)) as u32;
+        let origin = COORD { X: info.Left, Y: info.Top };
+        let mut written : u32 = 0;
+        unsafe {
+            FillConsoleOutputCharacterW(self.out_handle,
+                ' ' as u16, len, origin, &mut written);
+            FillConsoleOutputAttribute(self.out_handle,
+                0, len, origin, &mut written);
         }
     }
 }
