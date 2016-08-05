@@ -11,17 +11,23 @@ impl Position {
         Position {x: x, y: y}
     }
 
-    pub fn from_map_index(map: &Map, index: usize) -> Position {
+    pub fn from_map_index(map: &Size, index: usize) -> Position {
         Position {
-            x: (index % map.width) as i32,
-            y: (index / map.width) as i32,
+            x: (index % map.width as usize) as i32,
+            y: (index / map.width as usize) as i32,
         }
     }
 
-    pub fn to_map_index(&self, map: &Map) -> usize {
-        return self.y as usize * map.width + self.x as usize;
+    pub fn to_map_index(&self, map: &Size) -> usize {
+        return self.y as usize * map.width as usize + self.x as usize;
     }
 }
+
+pub struct Size {
+    pub width: u32,
+    pub height: u32,
+}
+
 
 #[derive(Copy, Clone)]
 pub enum Direction {
@@ -66,7 +72,7 @@ impl GameState {
         let mut gums : Vec<Gum> = Vec::new();
         for (index, &cell) in grid.cells.iter().enumerate() {
             if cell == Cell::Empty && index % 3 == 0 {
-                gums.push(Gum { position: Position::from_map_index(&grid, index) });
+                gums.push(Gum { position: Position::from_map_index(&grid.size, index) });
             }
         }
         return GameState {
@@ -84,7 +90,7 @@ impl GameState {
             Direction::Left => Position { x: max(0, pacman.position.x - 1), ..pacman.position },
             Direction::Right => Position { x: min((map.width - 1) as i32, pacman.position.x + 1), ..pacman.position },
         };
-        let map_position = new_position.to_map_index(map);
+        let map_position = new_position.to_map_index(&map.size);
         if map.cells[map_position] == Cell::Empty {
             pacman.position = new_position;
         }

@@ -15,6 +15,7 @@ pub use self::winapi::wincon::{BACKGROUND_INTENSITY, BACKGROUND_RED, BACKGROUND_
 
 use std::char;
 
+use game::*;
 
 pub struct ConsoleInput {
     in_handle: HANDLE,
@@ -50,11 +51,6 @@ impl ConsoleInput {
 #[derive(Copy, Clone)]
 pub struct ConsoleOutput {
     out_handle: HANDLE,
-}
-
-pub struct Size {
-    pub width: u32,
-    pub height: u32,
 }
 
 use std::os::raw::c_void;

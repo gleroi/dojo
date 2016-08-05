@@ -25,6 +25,7 @@ pub struct ConsoleRenderer {
     buffer: Vec<CHAR_INFO>,
     width: usize,
     height: usize,
+    size: Size
 }
 
 impl ConsoleRenderer {
@@ -36,6 +37,7 @@ impl ConsoleRenderer {
             buffer: vec![EMPTY; (size.width * size.height) as usize],
             width: size.width as usize,
             height: size.height as usize,
+            size: size,
         }
     }
     
@@ -52,9 +54,9 @@ impl ConsoleRenderer {
         let map_origin = Position::new(center.x - map.width as i32 / 2, center.y - map.height as i32 / 2);
 
         for map_index in 0..map.cells.len() {
-            let map_pos = Position::from_map_index(map, map_index);
+            let map_pos = Position::from_map_index(&map.size, map_index);
             let buffer_pos = Position::new(map_origin.x + map_pos.x, map_origin.y + map_pos.y);
-            let position = buffer_pos.y as usize * self.width + buffer_pos.x as usize;
+            let position = buffer_pos.to_map_index(&self.size);
             match map.cells[map_index] {
                 Cell::Empty => {
                     buffer[position] = CHAR_INFO {

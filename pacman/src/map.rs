@@ -85,8 +85,11 @@ static DEFAULT_MAP: [char; GRID_HEIGHT * GRID_WIDTH] =
      '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_',
      '_', '_'];
 
+use game::*;
+
 pub struct Map {
     pub cells: Vec<Cell>,
+    pub size: Size,
     pub width: usize,
     pub height: usize,
 }
@@ -105,7 +108,10 @@ impl Map {
     }
 
     pub fn new(width: usize, height: usize) -> Map {
-        let mut map = Map { cells: vec![Cell::Empty; width * height], width: width, height: height };
+        let mut map = Map { cells: vec![Cell::Empty; width * height], 
+            width: width, height: height,
+            size: Size { width: width as u32, height: height as u32 } 
+        };
         return map;
     }
 }
