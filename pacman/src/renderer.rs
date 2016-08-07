@@ -48,7 +48,13 @@ impl ConsoleRenderer {
     }
 
     fn update_score(&mut self, state: &GameState) {
-        self.write_at(&Position::new(0, 0), &format!("SCORE: {}", state.score), (FOREGROUND_INTENSITY | FOREGROUND_RED) as u16);
+        let center = Position::new(self.width as i32 / 2, self.height as i32 / 2);
+        let map_origin = Position::new(center.x - state.map.width as i32 / 2, center.y - state.map.height as i32 / 2);
+        let score_pos = &map_origin + &Position::new(0, -1);
+        self.write_at(&score_pos, &format!("SCORE: {}", state.score), (FOREGROUND_INTENSITY | FOREGROUND_RED) as u16);
+
+        let title_pos = &score_pos + &Position::new(state.map.width as i32 - 6, 0);
+        self.write_at(&title_pos, "PACMAN", FOREGROUND_YELLOW);
     }
 
     fn write_at(&mut self, start: &Position, str: &str, attributes: u16) {
