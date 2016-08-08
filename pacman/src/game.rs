@@ -38,6 +38,12 @@ pub struct Size {
     pub height: u32,
 }
 
+impl Size {
+    pub fn new(width: u32, height: u32) -> Size {
+        Size { width: width, height: height }
+    }
+}
+
 
 #[derive(Copy, Clone)]
 pub enum Direction {

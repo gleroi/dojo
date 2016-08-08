@@ -1,3 +1,5 @@
+extern crate rand;
+
 #[derive(Copy, Clone, PartialEq)]
 pub enum Cell {
     Empty,
@@ -114,5 +116,21 @@ impl Map {
             size: Size { width: width as u32, height: height as u32 } 
         };
         return map;
+    }
+}
+
+use std::ops::{Index, IndexMut};
+
+impl <'a> Index<&'a Position> for Map {
+    type Output = Cell;
+    fn index(&self, index: &Position) -> &Cell {
+        return &self.cells[index.to_map_index(&self.size)];
+    }
+}
+
+
+impl <'a> IndexMut<&'a Position> for Map {
+    fn index_mut(&mut self, index: &Position) -> &mut Cell {
+        return &mut self.cells[index.to_map_index(&self.size)];
     }
 }
