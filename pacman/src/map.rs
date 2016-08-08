@@ -134,3 +134,78 @@ impl <'a> IndexMut<&'a Position> for Map {
         return &mut self.cells[index.to_map_index(&self.size)];
     }
 }
+
+pub struct Generator {
+    size: Size,
+}
+
+use self::rand::{Rng, SeedableRng, StdRng};
+use self::rand::distributions::{IndependentSample, Range};
+
+struct MazeCell {
+    value: u32,
+    north: bool,
+    south: bool,
+    east: bool,
+    west: bool,
+}
+
+impl MazeCell {
+    fn new(val: u32) -> MazeCell {
+        MazeCell { value: val,
+            north: false, south: false, east: false, west: false
+        }
+    }
+}
+
+impl Generator {
+    pub fn new(width: u32, height: u32) -> Generator {
+        Generator {
+            size: Size::new(width, height),
+        }
+    }
+
+    pub fn generate(&mut self) {
+        let size = self.size.width * self.size.height;
+        let mut maze : Vec<MazeCell> = (0..size).map(|val| { MazeCell::new(val) }).collect();
+        let mut rand : StdRng = SeedableRng::from_seed(&[1,2,3,4] as &[_]);
+        let maze_range : Range<usize> = Range::new(0, size as usize);
+        let door_range : Range<usize> = Range::new(0, 4);
+
+        while !self.is_unified(maze) {
+            let index = maze_range.ind_sample(&mut rand);
+            let cell_pos = Position::from_map_index(&self.size, index);
+            let cell = &mut maze[index];
+            let door = door_range.ind_sample(&mut rand);
+            let other_cell_pos = match door {
+                0 if !cell.north => Position::new(cell_pos.x, cell_pos.y + 1),
+                1 if !cell.south => Position::new(cell_pos.x, cell_pos.y - 1),
+                2 if !cell.east => Position::new(cell_pos.x + 1, cell_pos.y),
+                3 if !cell.west => Position::new(cell_pos.x - 1, cell_pos.y),
+                _ => Position::new(-1,-1),
+            };
+            if other_cell_pos.x < 0 || other_cell_pos.x >= self.size.width as i32 ||
+                other_cell_pos.y < 0 || other_cell_pos.y >= self.size.height as i32 {
+                continue;
+            }
+            let other_cell_index = other_cell.to_map_index(&self.index);
+            let other_cell = &mut maze[other_cell_index]; 
+            if (cell.value != other_cell.value) {
+                match door {
+                    0 => { cell.north = true; other_cell.south = true; }
+                    1 => { cell.south = true; other_cell.north = true; }
+                    2 => { cell.east = true; other_cell.west = true; }
+                    3 => { cell.west = true; other_cell.east = true; }
+                    _ => panic!("unknown door number {}", door);
+                }
+
+                let old_value = other_cell.value;
+                for each_cell in &mut maze {
+                    if each_cell.value == old_value {
+                        each_cell.value = cell.value;
+                    }
+                }
+            }
+        }
+    }
+}
