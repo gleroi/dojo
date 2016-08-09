@@ -204,7 +204,7 @@ impl Generator {
         return true;
     }
 
-    fn find_door(&self, maze: &Vec<MazeCell>, cell_index: usize, door_index: &Door) -> Option<usize> {
+    fn find_other_cell(&self, maze: &Vec<MazeCell>, cell_index: usize, door_index: &Door) -> Option<usize> {
         let cell_pos = Position::from_map_index(&self.size, cell_index);
         let cell = &maze[cell_index];
         let other_cell_pos = match *door_index {
@@ -239,11 +239,11 @@ impl Generator {
         let mut rand: StdRng = SeedableRng::from_seed(arr_seed);
         let maze_range: Range<usize> = Range::new(0, size as usize);
         let door_range: Range<usize> = Range::new(0, 4);
-
+        
         while !self.is_unified(&maze) {
             let cell_index = maze_range.ind_sample(&mut rand);
             let door = Door::from(door_range.ind_sample(&mut rand));
-            if let Some(other_index) = self.find_door(&maze, cell_index, &door) {
+            if let Some(other_index) = self.find_other_cell(&maze, cell_index, &door) {
                 let other_door = match door {
                     Door::North => Door::South,
                     Door::South => Door::North,
