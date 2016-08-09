@@ -76,8 +76,10 @@ use std::cmp::{max, min};
 const DEFAULT_DIRECTION: Direction = Direction::Up;
 
 impl GameState {
-    pub fn new() -> GameState {
-        let grid = Map::new_default();
+    pub fn new(seed: usize) -> GameState {
+        let mut generator = Generator::new(28, 13);
+        generator.generate(seed);
+        let grid = generator.extract_map();
         let pacman = Pacman {
             position: Position {
                 x: grid.width as i32 / 2,
@@ -210,7 +212,7 @@ mod tests {
         let mut gums : Vec<Gum> = Vec::with_capacity(8);
         for index in 0..9 {
             if index != 4 {
-                gums.push(Gum { position: Position::from_map_index(&map, index) });
+                gums.push(Gum { position: Position::from_map_index(&map.size, index) });
             }
         }
 

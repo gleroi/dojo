@@ -37,7 +37,7 @@ fn run_input_thread(tx: mpsc::Sender<Direction>, default_direction: Direction) {
 }
 
 
-use std::time::Instant;
+use std::time::{Instant, SystemTime};
 
 trait Render {
     fn update(&mut self, state: &GameState);
@@ -49,7 +49,8 @@ trait GameUpdate {
 }
 
 fn main() {
-    let mut game_state = GameState::new();
+    let time =  SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_secs();
+    let mut game_state = GameState::new(time as usize);
     let (tx, rx) = mpsc::channel();
     let default_direction = game_state.pacman.direction;
 
