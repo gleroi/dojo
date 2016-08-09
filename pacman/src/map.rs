@@ -139,13 +139,6 @@ impl<'a> IndexMut<&'a Position> for Map {
     }
 }
 
-pub struct Generator {
-    size: Size,
-    maze: Option<Vec<MazeCell>>,
-}
-
-use self::rand::{Rng, SeedableRng, StdRng};
-use self::rand::distributions::{IndependentSample, Range};
 
 struct MazeCell {
     value: u32,
@@ -186,9 +179,22 @@ impl From<usize> for Door {
     }
 }
 
-impl Generator {
-    pub fn new(width: u32, height: u32) -> Generator {
-        Generator {
+pub trait Generator {
+    fn generate(&mut self, seed: usize);
+    fn extract_map(&self) -> Map;
+}
+
+pub struct DefaultGenerator {
+    size: Size,
+    maze: Option<Vec<MazeCell>>,
+}
+
+use self::rand::{Rng, SeedableRng, StdRng};
+use self::rand::distributions::{IndependentSample, Range};
+
+impl DefaultGenerator {
+    pub fn new(width: u32, height: u32) -> DefaultGenerator {
+        DefaultGenerator {
             size: Size::new(width, height),
             maze: None,
         }
@@ -231,15 +237,18 @@ impl Generator {
             Door::West => cell.west = true, 
         }
     }
+}
 
-    pub fn generate(&mut self, seed: usize) {
+impl Generator for DefaultGenerator {
+
+    fn generate(&mut self, seed: usize) {
         let size = self.size.width * self.size.height;
         let mut maze: Vec<MazeCell> = (0..size).map(|val| MazeCell::new(val)).collect();
         let arr_seed: &[_] = &[seed];
         let mut rand: StdRng = SeedableRng::from_seed(arr_seed);
         let maze_range: Range<usize> = Range::new(0, size as usize);
         let door_range: Range<usize> = Range::new(0, 4);
-        
+
         while !self.is_unified(&maze) {
             let cell_index = maze_range.ind_sample(&mut rand);
             let door = Door::from(door_range.ind_sample(&mut rand));
@@ -269,7 +278,7 @@ impl Generator {
         self.maze = Some(maze);
     }
 
-    pub fn extract_map(&self) -> Map {
+    fn extract_map(&self) -> Map {
         if let Some(ref maze) = self.maze {
             let mut map = Map::new((2 * self.size.width + 1) as usize,
                                    (2 * self.size.height + 1) as usize);
