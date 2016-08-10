@@ -138,7 +138,7 @@ impl<'a> IndexMut<&'a Position> for Map {
     }
 }
 
-
+#[derive(Default)]
 struct MazeCell {
     value: u32,
     north: bool,
@@ -183,5 +183,7 @@ pub trait Generator {
     fn extract_map(&self) -> Map;
 }
 
+mod randomwalk_generator;
 mod default_generator;
 pub use self::default_generator::*;
+pub use self::randomwalk_generator::*;

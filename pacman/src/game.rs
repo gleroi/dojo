@@ -77,7 +77,7 @@ const DEFAULT_DIRECTION: Direction = Direction::Up;
 
 impl GameState {
     pub fn new(seed: usize) -> GameState {
-        let generator : &mut Generator = &mut DefaultGenerator::new(28, 13);
+        let generator : &mut Generator = &mut RandomWalkGenerator::new(28, 13);
         generator.generate(seed);
         let grid = generator.extract_map();
         let pacman = Pacman {
