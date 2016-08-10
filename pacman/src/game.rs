@@ -129,7 +129,7 @@ impl GameUpdate for GameState {
             self.pacman.direction = direction;
         }
 
-        let horizontal_time_slice = Duration::from_millis(64);
+        let horizontal_time_slice = Duration::from_millis(72);
         let vertival_time_slice = horizontal_time_slice * 2;
         let elapsed = timer.elapsed();
         let update = match self.pacman.direction {
