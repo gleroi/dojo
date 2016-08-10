@@ -92,6 +92,7 @@ impl Generator for RandomWalkGenerator {
         let arr_seed: &[_] = &[seed];
         let mut rand: StdRng = SeedableRng::from_seed(arr_seed);
         let maze_range: Range<usize> = Range::new(0, size as usize);
+        let change_door_range: Range<usize> = Range::new(0, 10);
         let door_range: Range<usize> = Range::new(0, 4);
 
         let mut visiting : Vec<usize> = Vec::new();
@@ -103,7 +104,7 @@ impl Generator for RandomWalkGenerator {
         let mut current_door = Door::from(door_range.ind_sample(&mut rand));
 
         while visiting.len() > 0 {
-            if door_range.ind_sample(&mut rand) == 0 {
+            if change_door_range.ind_sample(&mut rand) == 0 {
                 current_door = Door::from(door_range.ind_sample(&mut rand));
             }
             let maybe_door = self.find_door(&maze, cell_index, current_door.clone(), 0);
