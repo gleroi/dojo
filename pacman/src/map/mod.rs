@@ -159,6 +159,7 @@ impl MazeCell {
     }
 }
 
+#[derive(Clone)]
 enum Door {
     North,
     South,

@@ -39,7 +39,6 @@ impl RandomWalkGenerator {
         if count == 4 {
             return None;
         }
-        let cell = &maze[index];
         if !self.is_door_open(maze, index, &door) {
             if let Some(other_index) = self.find_other_cell(maze, index, &door) {
                 if !self.was_visited(maze, other_index) {
@@ -101,8 +100,13 @@ impl Generator for RandomWalkGenerator {
         visiting.push(cell_index);
         self.mark_visited(&mut maze, cell_index);
 
+        let mut current_door = Door::from(door_range.ind_sample(&mut rand));
+
         while visiting.len() > 0 {
-            let maybe_door = self.find_door(&maze, cell_index, Door::from(door_range.ind_sample(&mut rand)), 0);
+            if door_range.ind_sample(&mut rand) == 0 {
+                current_door = Door::from(door_range.ind_sample(&mut rand));
+            }
+            let maybe_door = self.find_door(&maze, cell_index, current_door.clone(), 0);
             if let Some(door) = maybe_door {
                 if let Some(other_index) = self.find_other_cell(&maze, cell_index, &door) {
                     let other_door = match door {
