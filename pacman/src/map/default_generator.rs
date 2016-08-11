@@ -60,6 +60,14 @@ impl DefaultGenerator {
 
 impl Generator for DefaultGenerator {
 
+    fn maze(&self) -> &Option<Vec<MazeCell>> {
+        &self.maze
+    }
+    
+    fn size(&self) -> &Size {
+        &self.size
+    }
+
     fn generate(&mut self, seed: usize) {
         let size = self.size.width * self.size.height;
         let mut maze: Vec<MazeCell> = (0..size).map(|val| MazeCell::new(val)).collect();
@@ -95,52 +103,6 @@ impl Generator for DefaultGenerator {
             }
         }
         self.maze = Some(maze);
-    }
-
-    fn extract_map(&self) -> Map {
-        if let Some(ref maze) = self.maze {
-            let mut map = Map::new((2 * self.size.width + 1) as usize,
-                                   (2 * self.size.height + 1) as usize);
-            for index in 0..maze.len() {
-                let maze_pos = Position::from_map_index(&self.size, index);
-                let map_pos = Position::new(2 * maze_pos.x + 1, 2 * maze_pos.y + 1);
-                let maze_cell = &maze[index];
-                if !maze_cell.north {
-                    let mut door_pos = &map_pos + &Position::new(0, -1);
-                    map[&door_pos] = Cell::Wall;
-                    door_pos = &map_pos + &Position::new(-1, -1);
-                    map[&door_pos] = Cell::Wall;
-                    door_pos = &map_pos + &Position::new(1, -1);
-                    map[&door_pos] = Cell::Wall;
-                }
-                if !maze_cell.south {
-                    let mut door_pos = &map_pos + &Position::new(0, 1);
-                    map[&door_pos] = Cell::Wall;
-                    door_pos = &map_pos + &Position::new(-1, 1);
-                    map[&door_pos] = Cell::Wall;
-                    door_pos = &map_pos + &Position::new(1, 1);
-                    map[&door_pos] = Cell::Wall;
-                }
-                if !maze_cell.east {
-                    let mut door_pos = &map_pos + &Position::new(1, 0);
-                    map[&door_pos] = Cell::Wall;
-                    door_pos = &map_pos + &Position::new(1, 1);
-                    map[&door_pos] = Cell::Wall;
-                    door_pos = &map_pos + &Position::new(1, -1);
-                    map[&door_pos] = Cell::Wall;
-                }
-                if !maze_cell.west {
-                    let mut door_pos = &map_pos + &Position::new(-1, 0);
-                    map[&door_pos] = Cell::Wall;
-                    door_pos = &map_pos + &Position::new(-1, 1);
-                    map[&door_pos] = Cell::Wall;
-                    door_pos = &map_pos + &Position::new(-1, -1);
-                    map[&door_pos] = Cell::Wall;
-                }
-            }
-            return map;
-        }
-        panic!("call generate before extract map");
     }
 }
 
