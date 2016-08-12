@@ -7,7 +7,7 @@ use std;
 
 use map::*;
 
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Clone, Debug)]
 pub struct Position {
     pub x: i32,
     pub y: i32,
@@ -81,6 +81,7 @@ pub struct Gum {
 
 pub struct Monster {
     pub position: Position,
+    pub path: Vec<Position>,
 }
 
 pub struct GameState {
@@ -135,7 +136,7 @@ impl GameState {
         for _ in 0..4 {
             let initial = Position::new(x_range.ind_sample(&mut rand), y_range.ind_sample(&mut rand));
             let position = find_near_free_position(&grid, &monsters, &initial);
-            monsters.push(Monster { position: position });
+            monsters.push(Monster { position: position, path: Vec::new() });
         }
 
         return GameState {
@@ -170,16 +171,62 @@ impl GameState {
         return len != gums.len();
     }
 
-    fn update_monsters_positions(monsters: &mut Vec<Monster>, map: &Map) {
+    fn update_monsters_positions(monsters: &mut Vec<Monster>, pacman: &Pacman, map: &Map) {
         for monster in monsters.iter_mut() {
+            let update_path =  monster.path.len() == 0 || !monster.path.contains(&monster.position) || !monster.path.contains(&pacman.position);
+
+            if update_path {
+                monster.path = GameState::compute_path(&map, &monster.position, &pacman.position);
+            }
+            let path = &monster.path;
+
+            let monster_index = path.iter().enumerate()
+                .filter(|&(index, pos)| { pos == &monster.position })
+                .map(|(index, pos)| { index })
+                .nth(0).unwrap();
+            let pacman_index =path.iter().enumerate()
+                .filter(|&(index, pos)| { pos == &pacman.position })
+                .map(|(index, pos)| { index })
+                .nth(0).unwrap();
+            if monster_index <= pacman_index {
+                monster.position = path[monster_index + 1].clone();
+            }
+            else {
+                monster.position = path[monster_index - 1].clone();
+            }
+        }
+    }
+
+    fn compute_path(map: &Map, monster: &Position, pacman: &Position) -> Vec<Position> {
+        let mut path : Vec<Position> = Vec::new();
+        let mut current = monster.clone();
+        let mut visited = vec!{false; map.cells.len()};
+
+        while &current != pacman {
+            let mut next_found = false;
+
+            visited[current.to_map_index(&map.size)] = true;
+
             for direction in Direction::iter() {
-                let position = GameState::move_position(map, &monster.position, &direction);
-                if map[&position] == Cell::Empty {
-                    monster.position = position;
+                let next = GameState::move_position(&map, &current, &direction);
+                if map[&next] == Cell::Empty && !visited[next.to_map_index(&map.size)] {
+                    path.push(current);
+                    current = next;
+                    next_found = true;
                     break;
                 }
             }
+            // no direction found and no pacman, let backtrack
+            if !next_found && &current != pacman {
+                if let Some(previous) = path.pop() {
+                    current = previous;
+                }
+                else {
+                    panic!("no path found!");
+                }
+            }
         }
+        return path;
     }
     
 }
@@ -203,7 +250,7 @@ impl GameUpdate for GameState {
 
         if update {
             GameState::update_pacman_position(&mut self.pacman, &self.map);
-            GameState::update_monsters_positions(&mut self.monsters, &self.map);
+            GameState::update_monsters_positions(&mut self.monsters, &self.pacman, &self.map);
             if GameState::update_gums(&mut self.gums, &self.pacman) {
                 self.score += GUM_SCORE;
             }
