@@ -3,17 +3,17 @@ extern crate rand;
 use game::*;
 use map::{Generator, Map, Cell, MazeCell, Door};
 
-pub struct DefaultGenerator {
+pub struct RandomFusionGenerator {
     size: Size,
     maze: Option<Vec<MazeCell>>,
 }
 
-use self::rand::{Rng, SeedableRng, StdRng};
+use self::rand::{SeedableRng, StdRng};
 use self::rand::distributions::{IndependentSample, Range};
 
-impl DefaultGenerator {
-    pub fn new(width: u32, height: u32) -> DefaultGenerator {
-        DefaultGenerator {
+impl RandomFusionGenerator {
+    pub fn new(width: u32, height: u32) -> RandomFusionGenerator {
+        RandomFusionGenerator {
             size: Size::new(width, height),
             maze: None,
         }
@@ -58,7 +58,7 @@ impl DefaultGenerator {
     }
 }
 
-impl Generator for DefaultGenerator {
+impl Generator for RandomFusionGenerator {
 
     fn maze(&self) -> &Option<Vec<MazeCell>> {
         &self.maze
@@ -112,7 +112,7 @@ mod tests {
 
     #[test]
     fn generate_small_maze_should_not_failed() {
-        let mut generator = DefaultGenerator::new(5, 5);
+        let mut generator = RandomFusionGenerator::new(5, 5);
         generator.generate(1);
     }
 }

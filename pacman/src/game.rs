@@ -1,3 +1,10 @@
+extern crate rand;
+
+use self::rand::{Rng, SeedableRng, StdRng};
+use self::rand::distributions::{IndependentSample, Range};
+
+use std;
+
 use map::*;
 
 #[derive(PartialEq, Debug)]
@@ -120,11 +127,13 @@ impl GameState {
             }
         }
 
-        for x in 0..2 {
-            for y in 0..2 {
-                let position = find_near_free_position(&grid, &monsters, &Position::new(x * grid.size.width as i32, y * grid.size.height as i32));
-                monsters.push(Monster { position: position });
-            }
+        let arr_seed: &[_] = &[seed];
+        let mut rand: StdRng = SeedableRng::from_seed(arr_seed);
+        let pos_range: Range<i32> = Range::new(0, std::cmp::min(grid.width as i32, grid.height as i32));
+        for _ in 0..4 {
+            let initial = Position::new(pos_range.ind_sample(&mut rand), pos_range.ind_sample(&mut rand));
+            let position = find_near_free_position(&grid, &monsters, &initial);
+            monsters.push(Monster { position: position });
         }
 
         return GameState {
