@@ -129,9 +129,11 @@ impl GameState {
 
         let arr_seed: &[_] = &[seed];
         let mut rand: StdRng = SeedableRng::from_seed(arr_seed);
-        let pos_range: Range<i32> = Range::new(0, std::cmp::min(grid.width as i32, grid.height as i32));
+        let x_range: Range<i32> = Range::new(0, grid.width as i32);
+        let y_range: Range<i32> = Range::new(0, grid.height as i32);
+        
         for _ in 0..4 {
-            let initial = Position::new(pos_range.ind_sample(&mut rand), pos_range.ind_sample(&mut rand));
+            let initial = Position::new(x_range.ind_sample(&mut rand), y_range.ind_sample(&mut rand));
             let position = find_near_free_position(&grid, &monsters, &initial);
             monsters.push(Monster { position: position });
         }
