@@ -162,18 +162,18 @@ impl MazeCell {
 #[derive(Clone)]
 enum Door {
     North,
+    West,
     South,
     East,
-    West,
 }
 
 impl From<usize> for Door {
     fn from(index: usize) -> Door {
         match index {
             0 => Door::North,
-            1 => Door::South,
-            2 => Door::East,
-            3 => Door::West,
+            1 => Door::West,
+            2 => Door::South,
+            3 => Door::East,
             _ => panic!("unknown door index {}", index),
         }
     }

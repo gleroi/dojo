@@ -53,6 +53,15 @@ pub enum Direction {
     Left,
 }
 
+use std::slice::Iter;
+
+impl Direction {
+    fn iter() -> Iter<'static, Direction> {
+        static VALUES : [Direction; 4] = [Direction::Up,Direction::Right, Direction::Down, Direction::Left];
+        return VALUES.into_iter();
+    }
+}
+
 pub struct Pacman {
     pub position: Position,
     pub direction: Direction,
@@ -63,10 +72,15 @@ pub struct Gum {
     pub position: Position,
 }
 
+pub struct Monster {
+    pub position: Position,
+}
+
 pub struct GameState {
     pub map: Map,
     pub pacman: Pacman,
     pub gums: Vec<Gum>,
+    pub monsters: Vec<Monster>,
     pub score: i32,
 }
 
@@ -75,16 +89,28 @@ use std::cmp::{max, min};
 
 const DEFAULT_DIRECTION: Direction = Direction::Up;
 
+fn find_near_free_position(map: &Map, monsters: &Vec<Monster>, initial: &Position) -> Position {
+    let initial_index = initial.to_map_index(&map.size);
+    let length = map.cells.len();
+    for offset in 0..length {
+        let index = (initial_index + offset) % length;
+        let position = Position::from_map_index(&map.size, index); 
+        if map[&position] == Cell::Empty && monsters.iter().all(|other| other.position != position) {
+            return position;
+        }
+    }
+    panic!("no available free position");
+}
+
 impl GameState {
     pub fn new(seed: usize) -> GameState {
         let generator : &mut Generator = &mut RandomWalkGenerator::new(28, 13);
         generator.generate(seed);
         let grid = generator.extract_map();
+        let mut monsters : Vec<Monster> = Vec::new();
+
         let pacman = Pacman {
-            position: Position {
-                x: grid.width as i32 / 2,
-                y: grid.height as i32 / 2,
-            },
+            position: find_near_free_position(&grid, &monsters, &Position::new(grid.size.width  as i32 / 2, grid.size.height as i32 / 2 )),
             direction: DEFAULT_DIRECTION,
         };
         let mut gums : Vec<Gum> = Vec::new();
@@ -93,21 +119,34 @@ impl GameState {
                 gums.push(Gum { position: Position::from_map_index(&grid.size, index) });
             }
         }
+
+        for x in 0..2 {
+            for y in 0..2 {
+                let position = find_near_free_position(&grid, &monsters, &Position::new(x * grid.size.width as i32, y * grid.size.height as i32));
+                monsters.push(Monster { position: position });
+            }
+        }
+
         return GameState {
             map: grid,
             pacman: pacman,
             gums: gums,
+            monsters: monsters,
             score: 0,
         };
     }
 
+    fn move_position(map: &Map, position: &Position, direction: &Direction) -> Position {
+        match *direction {
+            Direction::Up => Position { y: max(0, position.y - 1), ..*position },
+            Direction::Down => Position { y: min((map.height - 1) as i32, position.y + 1), ..*position },
+            Direction::Left => Position { x: max(0, position.x - 1), ..*position },
+            Direction::Right => Position { x: min((map.width - 1) as i32, position.x + 1), ..*position },
+        }
+    }
+
     fn update_pacman_position(pacman: &mut Pacman, map: &Map) {
-        let new_position = match pacman.direction {
-            Direction::Up => Position { y: max(0, pacman.position.y - 1), ..pacman.position },
-            Direction::Down => Position { y: min((map.height - 1) as i32, pacman.position.y + 1), ..pacman.position },
-            Direction::Left => Position { x: max(0, pacman.position.x - 1), ..pacman.position },
-            Direction::Right => Position { x: min((map.width - 1) as i32, pacman.position.x + 1), ..pacman.position },
-        };
+        let new_position = GameState::move_position(map, &pacman.position, &pacman.direction);
         let map_position = new_position.to_map_index(&map.size);
         if map.cells[map_position] == Cell::Empty {
             pacman.position = new_position;
@@ -119,6 +158,19 @@ impl GameState {
         gums.retain(|ref gum| gum.position != pacman.position);
         return len != gums.len();
     }
+
+    fn update_monsters_positions(monsters: &mut Vec<Monster>, map: &Map) {
+        for monster in monsters.iter_mut() {
+            for direction in Direction::iter() {
+                let position = GameState::move_position(map, &monster.position, &direction);
+                if map[&position] == Cell::Empty {
+                    monster.position = position;
+                    break;
+                }
+            }
+        }
+    }
+    
 }
 
 use GameUpdate;
@@ -140,6 +192,7 @@ impl GameUpdate for GameState {
 
         if update {
             GameState::update_pacman_position(&mut self.pacman, &self.map);
+            GameState::update_monsters_positions(&mut self.monsters, &self.map);
             if GameState::update_gums(&mut self.gums, &self.pacman) {
                 self.score += GUM_SCORE;
             }

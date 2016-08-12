@@ -93,6 +93,22 @@ impl ConsoleRenderer {
             }
         }
 
+        let gums = &state.gums;
+        for gum in gums {
+            let gum_pos = &map_origin + &gum.position;
+            let map_index = gum_pos.to_map_index(&self.size);
+            buffer[map_index].UnicodeChar = '.' as u16;
+            buffer[map_index].Attributes |= FOREGROUND_WHITE;
+        }
+
+        let monsters = &state.monsters;
+        for monster in monsters {
+            let monster_pos = &map_origin + &monster.position;
+            let map_index = monster_pos.to_map_index(&self.size);
+            buffer[map_index].UnicodeChar = 'F' as u16;
+            buffer[map_index].Attributes = BACKGROUND_INTENSITY as u16 | BACKGROUND_RED as u16 | FOREGROUND_WHITE;
+        }
+
         let pacman = &state.pacman;
         let pacman_pos = &map_origin + &pacman.position;
         let position = pacman_pos.to_map_index(&self.size);
@@ -103,14 +119,6 @@ impl ConsoleRenderer {
             Direction::Right => 'C',
         } as u16;
         buffer[position].Attributes = FOREGROUND_BLACK | BACKGROUND_YELLOW;
-
-        let gums = &state.gums;
-        for gum in gums {
-            let gum_pos = &map_origin + &gum.position;
-            let map_index = gum_pos.to_map_index(&self.size);
-            buffer[map_index].UnicodeChar = '.' as u16;
-            buffer[map_index].Attributes |= FOREGROUND_WHITE;
-        }
     }
 
     fn print_buffer(output: &ConsoleOutput, buffer: &[CHAR_INFO], width: usize) {
