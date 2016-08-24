@@ -2,6 +2,7 @@ mod console;
 mod game;
 mod renderer;
 mod map;
+mod ai;
 
 use std::thread;
 use std::sync::mpsc;

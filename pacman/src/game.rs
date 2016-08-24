@@ -6,6 +6,8 @@ use self::rand::distributions::{IndependentSample, Range};
 use std;
 
 use map::*;
+use ai;
+
 
 #[derive(PartialEq, Clone, Debug)]
 pub struct Position {
@@ -63,7 +65,7 @@ pub enum Direction {
 use std::slice::Iter;
 
 impl Direction {
-    fn iter() -> Iter<'static, Direction> {
+    pub fn iter() -> Iter<'static, Direction> {
         static VALUES : [Direction; 4] = [Direction::Up,Direction::Right, Direction::Down, Direction::Left];
         return VALUES.into_iter();
     }
@@ -148,7 +150,7 @@ impl GameState {
         };
     }
 
-    fn move_position(map: &Map, position: &Position, direction: &Direction) -> Position {
+    pub fn move_position(map: &Map, position: &Position, direction: &Direction) -> Position {
         match *direction {
             Direction::Up => Position { y: max(0, position.y - 1), ..*position },
             Direction::Down => Position { y: min((map.height - 1) as i32, position.y + 1), ..*position },
@@ -176,7 +178,7 @@ impl GameState {
             let update_path =  monster.path.len() == 0 || !monster.path.contains(&monster.position) || !monster.path.contains(&pacman.position);
 
             if update_path {
-                monster.path = GameState::compute_path(&map, &monster.position, &pacman.position);
+                monster.path = ai::compute_path(&map, &monster.position, &pacman.position);
             }
             let path = &monster.path;
 
@@ -195,38 +197,6 @@ impl GameState {
                 monster.position = path[monster_index - 1].clone();
             }
         }
-    }
-
-    fn compute_path(map: &Map, monster: &Position, pacman: &Position) -> Vec<Position> {
-        let mut path : Vec<Position> = Vec::new();
-        let mut current = monster.clone();
-        let mut visited = vec!{false; map.cells.len()};
-
-        while &current != pacman {
-            let mut next_found = false;
-
-            visited[current.to_map_index(&map.size)] = true;
-
-            for direction in Direction::iter() {
-                let next = GameState::move_position(&map, &current, &direction);
-                if map[&next] == Cell::Empty && !visited[next.to_map_index(&map.size)] {
-                    path.push(current);
-                    current = next;
-                    next_found = true;
-                    break;
-                }
-            }
-            // no direction found and no pacman, let backtrack
-            if !next_found && &current != pacman {
-                if let Some(previous) = path.pop() {
-                    current = previous;
-                }
-                else {
-                    panic!("no path found!");
-                }
-            }
-        }
-        return path;
     }
     
 }
