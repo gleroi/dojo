@@ -12,8 +12,6 @@ fn main() {
 
     let _ = unsafe { window.make_current() };
 
-    println!("window is current: {}", window.is_current());
-
     loop {
         for event in window.poll_events() {
             match event {
