@@ -1,10 +1,14 @@
 extern crate glutin;
 
-use glutin::{Window, Event};
+use glutin::{Window, Event, WindowBuilder};
 
 fn main() {
-    let window = Window::new().unwrap();
-    window.set_title("rust window");
+    let builder = WindowBuilder::new();
+    let window = builder.with_title("rust window")
+        .with_transparency(false)
+        .with_decorations(true)
+        .build()
+        .unwrap();
 
     let _ = unsafe { window.make_current() };
 
