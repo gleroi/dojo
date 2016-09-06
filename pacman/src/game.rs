@@ -84,6 +84,7 @@ pub struct Gum {
 pub struct Monster {
     pub position: Position,
     pub path: Vec<Position>,
+    pub last_updated: Instant,
 }
 
 pub struct GameState {
@@ -138,7 +139,7 @@ impl GameState {
         for _ in 0..4 {
             let initial = Position::new(x_range.ind_sample(&mut rand), y_range.ind_sample(&mut rand));
             let position = find_near_free_position(&grid, &monsters, &initial);
-            monsters.push(Monster { position: position, path: Vec::new() });
+            monsters.push(Monster { position: position, path: Vec::new(), last_updated: Instant::now() });
         }
 
         return GameState {
@@ -148,6 +149,18 @@ impl GameState {
             monsters: monsters,
             score: 0,
         };
+    }
+
+    fn need_update(timer: &Instant, direction: &Direction) -> bool {
+        let horizontal_time_slice = Duration::from_millis(HORIZONTAL_TIME);
+        let vertival_time_slice = Duration::from_millis(VERTICAL_TIME);
+        let elapsed = timer.elapsed();
+
+        match *direction {
+            Direction::Up | Direction::Down if elapsed > vertival_time_slice => true,
+            Direction::Left | Direction::Right if elapsed > horizontal_time_slice => true,
+            _ => false,
+        }
     }
 
     pub fn move_position(map: &Map, position: &Position, direction: &Direction) -> Position {
@@ -175,13 +188,16 @@ impl GameState {
 
     fn update_monsters_positions(monsters: &mut Vec<Monster>, pacman: &Pacman, map: &Map) {
         for monster in monsters.iter_mut() {
-            let update_path =  monster.path.len() == 0 || !monster.path.contains(&monster.position) || !monster.path.contains(&pacman.position);
+            let update_path =  monster.path.len() == 0 || 
+                !monster.path.contains(&monster.position) || 
+                !monster.path.contains(&pacman.position);
 
             if update_path {
                 monster.path = ai::compute_path(&map, &monster.position, &pacman.position);
             }
             let path = &monster.path;
 
+            
             let monster_index = path.iter().enumerate()
                 .filter(|&(index, pos)| { pos == &monster.position })
                 .map(|(index, pos)| { index })
@@ -190,41 +206,50 @@ impl GameState {
                 .filter(|&(index, pos)| { pos == &pacman.position })
                 .map(|(index, pos)| { index })
                 .nth(0).unwrap();
-            if monster_index <= pacman_index {
-                monster.position = path[monster_index + 1].clone();
+            let next_position = if monster_index <= pacman_index {
+                path[monster_index + 1].clone()
             }
             else {
-                monster.position = path[monster_index - 1].clone();
+                path[monster_index - 1].clone()
+            };
+            let direction = if monster.position.x != next_position.x {
+                Direction::Left
+            }
+            else {
+                Direction::Up
+            };
+            if GameState::need_update(&monster.last_updated, &direction) {
+                monster.position = next_position;
+                monster.last_updated = Instant::now();
             }
         }
     }
     
 }
 
+const HORIZONTAL_TIME : u64 = 72;
+const VERTICAL_TIME : u64 = HORIZONTAL_TIME * 2;
+
 use GameUpdate;
 
 impl GameUpdate for GameState {
+
+
     fn update(&mut self, timer: &Instant, new_direction: Option<Direction>) -> bool {
         if let Some(direction) = new_direction {
             self.pacman.direction = direction;
         }
 
-        let horizontal_time_slice = Duration::from_millis(72);
-        let vertival_time_slice = horizontal_time_slice * 2;
-        let elapsed = timer.elapsed();
-        let update = match self.pacman.direction {
-            Direction::Up | Direction::Down if elapsed > vertival_time_slice => true,
-            Direction::Left | Direction::Right if elapsed > horizontal_time_slice => true,
-            _ => false,
-        };
+        let update = GameState::need_update(timer, &self.pacman.direction);
 
         if update {
             GameState::update_pacman_position(&mut self.pacman, &self.map);
-            GameState::update_monsters_positions(&mut self.monsters, &self.pacman, &self.map);
             if GameState::update_gums(&mut self.gums, &self.pacman) {
                 self.score += GUM_SCORE;
             }
         }
+        GameState::update_monsters_positions(&mut self.monsters, &self.pacman, &self.map);
+
         return update;
     }
 }
