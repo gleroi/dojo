@@ -198,19 +198,19 @@ impl GameState {
             let path = &monster.path;
 
             
-            let monster_index = path.iter().enumerate()
+            let monster_index : i32  = path.iter().enumerate()
                 .filter(|&(index, pos)| { pos == &monster.position })
                 .map(|(index, pos)| { index })
-                .nth(0).unwrap();
-            let pacman_index =path.iter().enumerate()
+                .nth(0).unwrap() as i32;
+            let pacman_index = path.iter().enumerate()
                 .filter(|&(index, pos)| { pos == &pacman.position })
                 .map(|(index, pos)| { index })
-                .nth(0).unwrap();
+                .nth(0).unwrap() as i32;
             let next_position = if monster_index < pacman_index {
-                path[monster_index + 1].clone()
+                path[std::cmp::min((monster_index + 1) as usize, path.len())].clone()
             }
             else {
-                path[std::cmp::max(0, monster_index - 1)].clone()
+                path[std::cmp::max(0, monster_index - 1) as usize].clone()
             };
             let direction = if monster.position.x != next_position.x {
                 Direction::Left
