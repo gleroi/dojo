@@ -206,11 +206,11 @@ impl GameState {
                 .filter(|&(index, pos)| { pos == &pacman.position })
                 .map(|(index, pos)| { index })
                 .nth(0).unwrap();
-            let next_position = if monster_index <= pacman_index {
+            let next_position = if monster_index < pacman_index {
                 path[monster_index + 1].clone()
             }
             else {
-                path[monster_index - 1].clone()
+                path[std::cmp::max(0, monster_index - 1)].clone()
             };
             let direction = if monster.position.x != next_position.x {
                 Direction::Left
