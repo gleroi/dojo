@@ -1,7 +1,8 @@
 [package]
 name = "window"
 version = "0.1.0"
-authors = ["Guillaume Leroi <guillaume-externe.leroi@erdf.fr>"]
+authors = ["Guillaume Leroi <leroi.g@gmail.com>"]
 
 [dependencies]
 glutin = "^0.6.1"
+gl = "^0.6.1"
