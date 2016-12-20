@@ -4,6 +4,8 @@ extern crate glutin;
 use glutin::{Event, WindowBuilder};
 
 mod vector3f;
+mod matrix4f;
+
 mod tut4;
 use tut4::Tut;
 
@@ -16,7 +18,7 @@ fn main() {
         .unwrap();
 
     let _ = unsafe { window.make_current() };
-
+    
     unsafe {
         gl::load_with(|symbol| window.get_proc_address(symbol) as *const _);
         gl::ClearColor(0.0, 0.0, 0.0, 0.0);
