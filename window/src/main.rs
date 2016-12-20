@@ -4,9 +4,8 @@ extern crate glutin;
 use glutin::{Event, WindowBuilder};
 
 mod vector3f;
-mod tut3;
-
-use tut3::Tut;
+mod tut4;
+use tut4::Tut;
 
 fn main() {
     let builder = WindowBuilder::new();
@@ -22,7 +21,6 @@ fn main() {
         gl::load_with(|symbol| window.get_proc_address(symbol) as *const _);
         gl::ClearColor(0.0, 0.0, 0.0, 0.0);
     }
-
     let mut tut = Tut::new();
     tut.init();
 

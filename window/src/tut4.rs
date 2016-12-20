@@ -10,8 +10,11 @@ use vector3f::Vector3f;
 pub struct Tut {
     vbo: GLuint,
     shaderProgram: GLuint,
+    scaleLocation: GLint,
     vertices: [Vector3f; 3]
 }
+
+static mut scale :f32 = 0.0;
 
 impl Tut {
 
@@ -19,6 +22,7 @@ impl Tut {
         Tut {
             vbo: 0,
             shaderProgram: 0,
+            scaleLocation: 0,
             vertices: [Vector3f::default(),Vector3f::default(),Vector3f::default()],
         }
     }
@@ -46,9 +50,9 @@ impl Tut {
             }
 
             let mut vs = String::new();
-            Tut::read_file("tut3/shader.vs", &mut vs);
+            Tut::read_file("tut4/shader.vs", &mut vs);
             let mut fs = String::new();
-            Tut::read_file("tut3/shader.fs", &mut fs);
+            Tut::read_file("tut4/shader.fs", &mut fs);
 
             self.add_shader(&vs, gl::VERTEX_SHADER);
             self.add_shader(&fs, gl::FRAGMENT_SHADER);
@@ -71,6 +75,8 @@ impl Tut {
             }
 
             gl::UseProgram(self.shaderProgram);
+
+            self.scaleLocation = gl::GetUniformLocation(self.shaderProgram, "gScale" as *const str as * const i8);
         }
     }
 
@@ -110,6 +116,9 @@ impl Tut {
         unsafe { 
             gl::Clear(gl::COLOR_BUFFER_BIT);
             
+            scale += 0.0001;
+            gl::Uniform1f(self.scaleLocation, scale.sin());
+
             gl::EnableVertexAttribArray(0);
             gl::BindBuffer(gl::ARRAY_BUFFER, self.vbo);
             gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, 0, std::ptr::null());
