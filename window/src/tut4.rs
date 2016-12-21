@@ -14,10 +14,10 @@ pub struct Tut {
     shaderProgram: GLuint,
     worldLocation: GLint,
     vertices: [Vector3f; 4],
-    indexes: [usize; 12],
+    indexes: [u32; 12],
 }
 
-static mut scale :f32 = 0.0;
+static mut scale : f32 = 0.0;
 
 impl Tut {
 
@@ -34,25 +34,26 @@ impl Tut {
 
     pub fn init(&mut self) {
         unsafe {
+            let val = 0.5;
             self.vertices = [
-                Vector3f::new(-1.0,-1.0,0.0),
-                Vector3f::new(0.0,-1.0,1.0),
-                Vector3f::new(1.0,-1.0,0.0),
-                Vector3f::new(0.0,1.0,0.0)
+                Vector3f::new(0.0,   val,  0.0),
+                Vector3f::new(-val, -val,  val),
+                Vector3f::new(val,  -val,  val),
+                Vector3f::new(0.0,  -val, -val),
             ];
             gl::GenBuffers(1, &mut self.vbo);
             gl::BindBuffer(gl::ARRAY_BUFFER, self.vbo);
             gl::BufferData(gl::ARRAY_BUFFER, (self.vertices.len() * std::mem::size_of::<Vector3f>()) as isize, &self.vertices as * const Vector3f as * const c_void, gl::STATIC_DRAW);
 
             self.indexes = [
+                0,2,1,
+                0,3,2,
                 0,3,1,
-                1,3,2,
-                2,3,0,
-                0,1,2,
+                1,2,3,
             ];
             gl::GenBuffers(1, &mut self.ibo);
             gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, self.ibo);
-            gl::BufferData(gl::ELEMENT_ARRAY_BUFFER, (self.indexes.len() * std::mem::size_of::<i32>()) as isize, &self.indexes as * const usize as * const c_void, gl::STATIC_DRAW);
+            gl::BufferData(gl::ELEMENT_ARRAY_BUFFER, (self.indexes.len() * std::mem::size_of::<usize>()) as isize, &self.indexes as * const u32 as * const c_void, gl::STATIC_DRAW);
         }
         self.compile_shaders();
     }
@@ -138,11 +139,12 @@ impl Tut {
             world[(2,0)] = scale.sin(); world[(2,1)] = 0.0; world[(2,2)] = scale.cos() ; world[(2,3)] = 0.0;
             world[(3,0)] = 0.0;         world[(3,1)] = 0.0; world[(3,2)] = 0.0        ;  world[(3,3)] = 1.0;
 
-            gl::UniformMatrix4fv(self.worldLocation, 1, gl::TRUE, world.as_ref() as * const [(f32)] as * const f32);
+            gl::UniformMatrix4fv(self.worldLocation, 1, gl::TRUE, world.as_ref() as * const [f32] as * const f32);
 
             gl::EnableVertexAttribArray(0);
             gl::BindBuffer(gl::ARRAY_BUFFER, self.vbo);
             gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, 0, std::ptr::null());
+
             gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, self.ibo);
             gl::DrawElements(gl::TRIANGLES, self.indexes.len() as i32, gl::UNSIGNED_INT, std::ptr::null());
             gl::DisableVertexAttribArray(0);
