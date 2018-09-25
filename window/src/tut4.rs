@@ -73,6 +73,8 @@ impl Tut {
             self.add_shader(&vs, gl::VERTEX_SHADER);
             self.add_shader(&fs, gl::FRAGMENT_SHADER);
 
+            gl::BindFragDataLocation(self.shaderProgram, 0, "FragColor" as *const str as *const i8);
+
             let mut success : GLint = 0;
             let mut error : [u8; 1024] = [0; 1024];
 
