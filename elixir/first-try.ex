@@ -1,6 +1,6 @@
 defmodule FirstTry do
 
-# one exhcanges message with two and detect when two exits
+# one exchanges message with two and detect when two exits
   def one(other, cnt) do
     Process.monitor(other)
     send(other, {:one, cnt})
