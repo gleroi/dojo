@@ -3,7 +3,7 @@ defmodule FirstTry do
 # one exchanges message with two and detect when two exits
   def one(other, cnt) do
     Process.monitor(other)
-    send(other, {:one, cnt})
+    send(other, {:one, cnt, self()})
     one_rec(other, cnt+1)
     IO.puts("one exited")
   end
@@ -13,30 +13,29 @@ defmodule FirstTry do
     receive do
       {name, counter} -> 
         IO.puts("one receive: #{name} @ #{counter}")
-        send(other, {:one, cnt})
+        send(other, {:one, cnt, self()})
         one_rec(other, cnt+1)
       msg -> 
         IO.puts("one receive: #{inspect msg} EXIT!!!")
     end
   end
 
-  def two(other, cnt) do
+  def two(cnt) do
     Process.sleep(250)
     unless cnt >= 10 do
       receive do
-        {name, counter} -> IO.puts("two receive: #{name} @ #{counter}")
+        {name, counter, pid} -> 
+          IO.puts("two receive: #{name} @ #{counter}")
+          send pid, {"two", cnt}
       end
-      send other, {"two", cnt}
-      two(other, cnt+1)
+      two(cnt+1)
     end
   end
 
 end
 
-pid1 = spawn(FirstTry, :one, [:two, 0])
-Process.register(pid1, :one)
+pid2 = spawn(FirstTry, :two, [0])
+spawn(FirstTry, :one, [pid2, 0])
 
-pid2 = spawn(FirstTry, :two, [:one, 0])
-Process.register(pid2, :two)
 
 
