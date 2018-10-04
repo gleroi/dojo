@@ -1,6 +1,6 @@
 [package]
 name = "inheritance"
 version = "0.1.0"
-authors = ["Guillaume Leroi <guillaume-externe.leroi@erdf.fr>"]
+authors = ["Guillaume Leroi <leroi.g@gmail.com>"]
 
 [dependencies]
